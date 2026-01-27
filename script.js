@@ -1,4 +1,3 @@
-// Configuração do Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyBm9dy9MXr9Lg3lNqLX5wzMYuy5i_Q8Hdc",
   authDomain: "prof-da-hora.firebaseapp.com",
@@ -15,7 +14,6 @@ const db = firebase.firestore();
 let capaBase64 = "";
 let perfilBase64 = "";
 
-// Converte a Foto de Capa
 document.getElementById('fotoCapaInput').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (file) {
@@ -25,7 +23,6 @@ document.getElementById('fotoCapaInput').addEventListener('change', function(e) 
     }
 });
 
-// Converte a Foto de Perfil
 document.getElementById('fotoPerfilInput').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (file) {
@@ -70,16 +67,13 @@ function carregarLista() {
             lista.innerHTML += `
                 <div class="card bg-white rounded-lg shadow-md overflow-hidden mb-6 border border-gray-200">
                     <img src="${p.fotoCapa || 'https://via.placeholder.com/400x150?text=Trabalho'}" class="w-full h-32 object-cover">
-                    
                     <div class="px-4 pb-4">
                         <div class="flex flex-col items-center">
                             <img src="${p.fotoPerfil || 'https://via.placeholder.com/80?text=Foto'}" class="w-20 h-20 rounded-full border-4 border-white shadow-md -mt-10 object-cover bg-gray-200">
-                            <h3 class="font-bold text-lg mt-2 text-gray-800">${p.nome}</h3>
+                            <h3 class="font-bold text-lg mt-2">${p.nome}</h3>
                             <p class="text-blue-600 text-sm font-bold">${p.profissao}</p>
                         </div>
-                        
                         <p class="text-gray-600 text-xs mt-3 mb-4 text-center italic border-t pt-2">${p.descricao}</p>
-                        
                         <div class="flex space-x-2">
                             <button onclick="excluirPerfil('${id}')" class="flex-1 bg-gray-100 text-red-500 py-2 rounded text-xs font-bold">DELETAR</button>
                             <a href="https://wa.me/${p.whatsapp}" target="_blank" class="flex-[2] block text-center bg-green-500 text-white py-2 rounded-md font-bold text-sm">WHATSAPP</a>
@@ -92,8 +86,24 @@ function carregarLista() {
 }
 
 async function excluirPerfil(id) {
-    if (confirm("Deseja apagar este cadastro?")) {
-        try { await db.collection("profissionais").doc(id).delete(); } catch (e) { alert(e.message); }
+    const senhaMestra = "1234"; 
+    const senhaDigitada = prompt("Digite a senha de administrador para excluir:");
+
+    if (senhaDigitada === senhaMestra) {
+        if (confirm("Deseja realmente remover este cadastro?")) {
+            try {
+                await db.collection("profissionais").doc(id).delete();
+                Toastify({ text: "✅ Removido!", duration: 3000, style: { background: "green" } }).showToast();
+            } catch (e) { alert(e.message); }
+        }
+    } else {
+        Toastify({
+            text: "❌ Você não tem permissão para deletar esse cadastro!",
+            duration: 3500,
+            gravity: "top",
+            position: "center",
+            style: { background: "linear-gradient(to right, #ff5f6d, #ffc371)", borderRadius: "10px" }
+        }).showToast();
     }
 }
 
