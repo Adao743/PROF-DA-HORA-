@@ -1,139 +1,55 @@
-const firebaseConfig = {
-  apiKey: "AIzaSyBm9dy9MXr9Lg3lNqLX5wzMYuy5i_Q8Hdc",
-  authDomain: "prof-da-hora.firebaseapp.com",
-  projectId: "prof-da-hora",
-  storageBucket: "prof-da-hora.firebasestorage.app",
-  messagingSenderId: "124661519863",
-  appId: "1:124661519863:web:600d142f499a0d5c43d810",
-  measurementId: "G-37CWFVZQ9"
-};
+// FUNÇÃO MÁGICA PARA DIMINUIR A FOTO
+function redimensionarImagem(file, callback) {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+            // Define o tamanho máximo (800 pixels)
+            const max_size = 800;
+            if (width > height) {
+                if (width > max_size) {
+                    height *= max_size / width;
+                    width = max_size;
+                }
+            } else {
+                if (height > max_size) {
+                    width *= max_size / height;
+                    height = max_size;
+                }
+            }
 
-// 1. IDENTIFICAÇÃO DO CELULAR (RG)
-let meuID = localStorage.getItem('usuario_id');
-if (!meuID) {
-    meuID = 'user_' + Math.random().toString(36).substr(2, 9);
-    localStorage.setItem('usuario_id', meuID);
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, width, height);
+
+            // Transforma em JPEG com 70% de qualidade para ficar leve
+            callback(canvas.toDataURL("image/jpeg", 0.7));
+        };
+        img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
 }
 
-let capaBase64 = "";
-let perfilBase64 = "";
-
-// Captura de Imagens
+// NOVOS OUVINTES DE FOTO (USANDO O REDIMENSIONADOR)
 document.getElementById('fotoCapaInput').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => { capaBase64 = event.target.result; };
-        reader.readAsDataURL(file);
+    if (e.target.files[0]) {
+        redimensionarImagem(e.target.files[0], (base64) => {
+            capaBase64 = base64;
+            console.log("Capa pronta e leve!");
+        });
     }
 });
 
 document.getElementById('fotoPerfilInput').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => { perfilBase64 = event.target.result; };
-        reader.readAsDataURL(file);
+    if (e.target.files[0]) {
+        redimensionarImagem(e.target.files[0], (base64) => {
+            perfilBase64 = base64;
+            console.log("Perfil pronto e leve!");
+        });
     }
 });
-
-// Função Salvar
-async function salvarCadastro() {
-    const nome = document.getElementById('nome').value;
-    const prof = document.getElementById('profissao').value;
-    const desc = document.getElementById('descricao').value;
-    const whats = document.getElementById('whatsapp').value;
-
-    if (!nome || !prof || !whats) {
-        alert("Preencha os campos obrigatórios!");
-        return;
-    }
-
-    try {
-        await db.collection("profissionais").add({
-            nome, 
-            profissao: prof, 
-            descricao: desc, 
-            whatsapp: whats,
-            fotoCapa: capaBase64,
-            fotoPerfil: perfilBase64,
-            criadorID: meuID, 
-            data: new Date()
-        });
-        alert("✅ Publicado com sucesso!");
-        location.reload(); 
-    } catch (error) {
-        alert("Erro ao salvar: " + error.message);
-    }
-}
-
-// FUNÇÃO CARREGAR LISTA - MOSTRA TUDO PARA TODOS
-function carregarLista() {
-    const lista = document.getElementById('lista-profissionais');
-    
-    // Ouve o banco de dados em tempo real
-    db.collection("profissionais").orderBy("data", "desc").onSnapshot((snapshot) => {
-        lista.innerHTML = "";
-        
-        if (snapshot.empty) {
-            lista.innerHTML = "<p class='text-center text-gray-500'>Nenhum profissional cadastrado.</p>";
-            return;
-        }
-
-        snapshot.forEach((doc) => {
-            const p = doc.data();
-            const id = doc.id;
-            
-            // Verifica se este celular é o dono para mostrar o botão
-            const ehDono = (p.criadorID === meuID);
-
-            lista.innerHTML += `
-                <div class="card-item bg-white rounded-lg shadow-md overflow-hidden mb-6 border border-gray-200">
-                    <img src="${p.fotoCapa || 'https://via.placeholder.com/400x150?text=Trabalho'}" class="w-full h-32 object-cover">
-                    <div class="px-4 pb-4">
-                        <div class="flex flex-col items-center">
-                            <img src="${p.fotoPerfil || 'https://via.placeholder.com/80?text=Foto'}" class="w-20 h-20 rounded-full border-4 border-white shadow-md -mt-10 object-cover bg-gray-200">
-                            <h3 class="font-bold text-lg mt-2">${p.nome}</h3>
-                            <p class="text-blue-600 text-sm font-bold">${p.profissao}</p>
-                        </div>
-                        <p class="text-gray-600 text-xs mt-3 mb-4 text-center italic border-t pt-2">${p.descricao}</p>
-                        <div class="flex space-x-2">
-                            ${ehDono ? `<button onclick="excluirPerfil('${id}')" class="flex-1 bg-gray-100 text-red-500 py-2 rounded text-xs font-bold">DELETAR</button>` : ''}
-                            <a href="https://wa.me/${p.whatsapp}" target="_blank" class="flex-[2] block text-center bg-green-500 text-white py-2 rounded-md font-bold text-sm">WHATSAPP</a>
-                        </div>
-                    </div>
-                </div>
-            `;
-        });
-    });
-}
-
-// Função Excluir
-async function excluirPerfil(id) {
-    if (confirm("Deseja realmente remover seu cadastro?")) {
-        try {
-            await db.collection("profissionais").doc(id).delete();
-            Toastify({ text: "✅ Removido!", duration: 3000, style: { background: "green" } }).showToast();
-        } catch (e) { alert(e.message); }
-    }
-}
-
-// FUNÇÃO FILTRAR - CORRIGIDA PARA NÃO SUMIR COM OS CARDS
-function filtrar() {
-    const termo = document.getElementById('inputPesquisa').value.toLowerCase();
-    const cards = document.getElementsByClassName('card-item');
-    
-    for (let card of cards) {
-        const textoCard = card.innerText.toLowerCase();
-        if (textoCard.includes(termo)) {
-            card.style.display = "block";
-        } else {
-            card.style.display = "none";
-        }
-    }
-}
-
-carregarLista();
