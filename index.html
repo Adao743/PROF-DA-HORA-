@@ -5,16 +5,78 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PROF DA HORA</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .hidden { display: none; }
+    </style>
 </head>
-<body class="bg-gray-100 font-sans">
-    <nav class="bg-blue-600 p-4 text-white shadow-lg">
-        <h1 class="text-2xl font-bold text-center uppercase">Prof da Hora</h1>
-    </nav>
+<body class="bg-slate-50 font-sans text-gray-800">
 
-    <main class="p-6 max-w-lg mx-auto">
-        <div id="lista-perfis" class="space-y-6">
+    <div id="tela-login" class="min-h-screen flex items-center justify-center p-6">
+        <div class="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full border border-blue-100">
+            <h1 class="text-3xl font-bold text-blue-600 text-center mb-2">PROF DA HORA</h1>
+            <p class="text-center text-gray-400 text-sm mb-8 italic">MandroidApp DEVELOPER</p>
+            
+            <div class="space-y-4">
+                <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 h-40 overflow-y-auto text-xs text-gray-600">
+                    <h3 class="font-bold mb-2">TERMOS DE RESPONSABILIDADE:</h3>
+                    As ligações pelos usuários são de inteira responsabilidade de usuários cadastro. Ao aceitar os termos você declara mostrar seu contato ao público, sem a nossa responsabilidade pelas conversas fora do aplicativo!
+                </div>
+                
+                <label class="flex items-center gap-3 cursor-pointer">
+                    <input type="checkbox" id="aceite-termos" class="w-5 h-5 accent-blue-600">
+                    <span class="text-sm text-gray-600">Aceito os termos de responsabilidade</span>
+                </label>
+
+                <button onclick="fazerLogin()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl shadow-lg hover:bg-blue-700 transition">
+                    ENTRAR NO APP
+                </button>
             </div>
-    </main>
+        </div>
+    </div>
+
+    <div id="tela-app" class="hidden min-h-screen pb-20">
+        <nav class="bg-white p-4 shadow-sm sticky top-0 z-10 border-b border-blue-100">
+            <h2 class="text-xl font-bold text-blue-600 text-center">PROF DA HORA</h2>
+        </nav>
+
+        <main class="p-4 max-w-2xl mx-auto space-y-8">
+            <section id="sessao-cadastro" class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
+                <h3 class="font-bold text-lg mb-4 border-b pb-2">Meu Cadastro</h3>
+                <div class="space-y-4">
+                    <div class="flex flex-col items-center mb-4">
+                        <div id="preview-foto" class="w-24 h-24 bg-gray-200 rounded-full mb-2 flex items-center justify-center overflow-hidden border-2 border-blue-200">
+                            <span class="text-gray-400 text-xs">Sem Foto</span>
+                        </div>
+                        <input type="file" id="foto" accept="image/*" class="text-xs">
+                    </div>
+                    <input type="text" id="nome" placeholder="Seu Nome Completo" class="w-full p-3 bg-gray-50 border rounded-xl outline-none focus:border-blue-400">
+                    <input type="text" id="profissao" placeholder="Sua Profissão" class="w-full p-3 bg-gray-50 border rounded-xl outline-none focus:border-blue-400">
+                    <textarea id="descricao" placeholder="Descrição dos seus serviços" class="w-full p-3 bg-gray-50 border rounded-xl outline-none focus:border-blue-400"></textarea>
+                    <input type="tel" id="whatsapp" placeholder="Seu WhatsApp (Ex: 53999...)" class="w-full p-3 bg-gray-50 border rounded-xl outline-none focus:border-blue-400">
+                    
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="salvarCadastro()" class="bg-green-600 text-white font-bold py-3 rounded-xl">SALVAR</button>
+                        <button onclick="deletarMeuCadastro()" class="bg-red-50 text-red-600 font-bold py-3 rounded-xl border border-red-100">DELETAR</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="space-y-4">
+                <div class="relative">
+                    <input type="text" id="busca" onkeyup="buscar()" placeholder="🔍 Buscar nome ou profissão..." class="w-full p-4 pl-12 bg-white rounded-2xl shadow-sm border border-gray-100 outline-none">
+                </div>
+                
+                <div id="lista-publica" class="space-y-4">
+                    </div>
+            </section>
+        </main>
+
+        <footer class="p-8 text-center text-xs text-gray-400 space-y-1">
+            <p>Adão Everton Tavares Miranda</p>
+            <p>Email: criador743@gmail.com</p>
+            <p>Contato: +5553999254363</p>
+        </footer>
+    </div>
 
     <script src="script.js"></script>
 </body>
