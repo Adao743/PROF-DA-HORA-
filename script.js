@@ -2,7 +2,6 @@ let profissionais = JSON.parse(localStorage.getItem('prof_da_hora_data')) || [];
 let minhaFotoBase64 = "";
 let idEdicao = null;
 
-// 1. Login e Sair
 function fazerLogin() {
     const check = document.getElementById('aceite-termos');
     if (check && check.checked) {
@@ -19,7 +18,6 @@ function sairApp() {
     document.getElementById('tela-login').classList.remove('hidden');
 }
 
-// 2. Lógica da Foto com Compressão
 document.getElementById('foto').addEventListener('change', function(e) {
     const file = e.target.files[0];
     const reader = new FileReader();
@@ -38,9 +36,7 @@ document.getElementById('foto').addEventListener('change', function(e) {
     reader.readAsDataURL(file);
 });
 
-// 3. Salvar ou Atualizar (COM TRAVA ANTI-REPETIÇÃO)
 function salvarCadastro() {
-    const btn = document.getElementById('btn-salvar');
     const nome = document.getElementById('nome').value;
     const prof = document.getElementById('profissao').value;
     const desc = document.getElementById('descricao').value;
@@ -48,35 +44,21 @@ function salvarCadastro() {
 
     if (!nome || !prof || !whats) return alert("Preencha os campos!");
 
-    // Bloqueia o botão para evitar cliques múltiplos
-    btn.disabled = true;
-    const textoOriginal = btn.innerText;
-    btn.innerText = "PROCESSANDO...";
-
     if (idEdicao) {
         const index = profissionais.findIndex(p => p.id === idEdicao);
         profissionais[index] = { ...profissionais[index], nome, profissao: prof, descricao: desc, whatsapp: whats, foto: minhaFotoBase64 || profissionais[index].foto };
         idEdicao = null;
     } else {
-        // Só adiciona se não houver um nome igual com a mesma profissão
-        const jaExiste = profissionais.find(p => p.nome === nome && p.profissao === prof);
-        if (!jaExiste) {
-            profissionais.push({ id: Date.now(), nome, profissao: prof, descricao: desc, whatsapp: whats, foto: minhaFotoBase64, likes: 0 });
-        } else {
-            alert("Este profissional já está cadastrado!");
-        }
+        // Simples: adiciona o novo profissional
+        profissionais.push({ id: Date.now(), nome, profissao: prof, descricao: desc, whatsapp: whats, foto: minhaFotoBase64, likes: 0 });
     }
 
     localStorage.setItem('prof_da_hora_data', JSON.stringify(profissionais));
     limparCampos(); 
     renderizarLista();
-    
-    // Libera o botão
-    btn.disabled = false;
-    btn.innerText = "SALVAR";
+    alert("Dados salvos!");
 }
 
-// 4. Renderizar Lista
 function renderizarLista(filtro = "") {
     const lista = document.getElementById('lista-publica');
     if(!lista) return;
@@ -111,7 +93,6 @@ function prepararEdicao(id) {
     document.getElementById('descricao').value = p.descricao;
     document.getElementById('whatsapp').value = p.whatsapp;
     idEdicao = id;
-    document.getElementById('btn-salvar').innerText = "ATUALIZAR";
     window.scrollTo(0, 0);
 }
 
@@ -131,7 +112,6 @@ function limparCampos() {
     document.getElementById('preview-foto').innerHTML = '<span class="text-gray-400 text-xs text-center px-1">Foto da Galeria</span>';
     minhaFotoBase64 = "";
     idEdicao = null;
-    document.getElementById('btn-salvar').innerText = "SALVAR";
 }
 
 function buscar() { renderizarLista(document.getElementById('busca').value); }
