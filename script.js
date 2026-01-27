@@ -2,6 +2,7 @@ let profissionais = JSON.parse(localStorage.getItem('prof_da_hora_data')) || [];
 let minhaFotoBase64 = "";
 let idEdicao = null;
 
+// 1. Login e Sair
 function fazerLogin() {
     const check = document.getElementById('aceite-termos');
     if (check && check.checked) {
@@ -18,6 +19,7 @@ function sairApp() {
     document.getElementById('tela-login').classList.remove('hidden');
 }
 
+// 2. Lógica da Foto com Compressão
 document.getElementById('foto').addEventListener('change', function(e) {
     const file = e.target.files[0];
     const reader = new FileReader();
@@ -36,29 +38,51 @@ document.getElementById('foto').addEventListener('change', function(e) {
     reader.readAsDataURL(file);
 });
 
+// 3. Salvar ou Atualizar (COM TRAVA ANTI-REPETIÇÃO)
 function salvarCadastro() {
+    const btn = document.getElementById('btn-salvar');
     const nome = document.getElementById('nome').value;
     const prof = document.getElementById('profissao').value;
     const desc = document.getElementById('descricao').value;
     const whats = document.getElementById('whatsapp').value;
+
     if (!nome || !prof || !whats) return alert("Preencha os campos!");
+
+    // Bloqueia o botão para evitar cliques múltiplos
+    btn.disabled = true;
+    const textoOriginal = btn.innerText;
+    btn.innerText = "PROCESSANDO...";
+
     if (idEdicao) {
         const index = profissionais.findIndex(p => p.id === idEdicao);
         profissionais[index] = { ...profissionais[index], nome, profissao: prof, descricao: desc, whatsapp: whats, foto: minhaFotoBase64 || profissionais[index].foto };
         idEdicao = null;
-        document.getElementById('btn-salvar').innerText = "SALVAR";
     } else {
-        profissionais.push({ id: Date.now(), nome, profissao: prof, descricao: desc, whatsapp: whats, foto: minhaFotoBase64, likes: 0 });
+        // Só adiciona se não houver um nome igual com a mesma profissão
+        const jaExiste = profissionais.find(p => p.nome === nome && p.profissao === prof);
+        if (!jaExiste) {
+            profissionais.push({ id: Date.now(), nome, profissao: prof, descricao: desc, whatsapp: whats, foto: minhaFotoBase64, likes: 0 });
+        } else {
+            alert("Este profissional já está cadastrado!");
+        }
     }
+
     localStorage.setItem('prof_da_hora_data', JSON.stringify(profissionais));
-    limparCampos(); renderizarLista();
+    limparCampos(); 
+    renderizarLista();
+    
+    // Libera o botão
+    btn.disabled = false;
+    btn.innerText = "SALVAR";
 }
 
+// 4. Renderizar Lista
 function renderizarLista(filtro = "") {
     const lista = document.getElementById('lista-publica');
     if(!lista) return;
     lista.innerHTML = '';
     const filtrados = profissionais.filter(p => p.nome.toLowerCase().includes(filtro.toLowerCase()) || p.profissao.toLowerCase().includes(filtro.toLowerCase()));
+
     filtrados.forEach(p => {
         lista.innerHTML += `
             <div class="bg-white p-4 rounded-2xl shadow-md border border-gray-100 mb-4">
@@ -71,7 +95,7 @@ function renderizarLista(filtro = "") {
                     </div>
                 </div>
                 <div class="mt-4 flex flex-wrap gap-2">
-                    <a href="https://wa.me/${p.whatsapp}" class="flex-1 bg-green-500 text-white text-center py-2 rounded-lg font-bold text-sm">WhatsApp</a>
+                    <a href="https://wa.me/${p.whatsapp}" target="_blank" class="flex-1 bg-green-500 text-white text-center py-2 rounded-lg font-bold text-sm">WhatsApp</a>
                     <button onclick="darLike(${p.id})" class="px-4 py-2 bg-pink-50 text-pink-600 rounded-lg text-sm font-bold">❤️ ${p.likes}</button>
                     <button onclick="prepararEdicao(${p.id})" class="px-3 py-2 bg-blue-50 text-blue-600 rounded-lg text-xs font-bold">Editar</button>
                     <button onclick="deletarUm(${p.id})" class="px-3 py-2 bg-red-50 text-red-600 rounded-lg text-xs font-bold">Apagar</button>
@@ -104,8 +128,10 @@ function limparCampos() {
     document.getElementById('profissao').value = '';
     document.getElementById('descricao').value = '';
     document.getElementById('whatsapp').value = '';
+    document.getElementById('preview-foto').innerHTML = '<span class="text-gray-400 text-xs text-center px-1">Foto da Galeria</span>';
     minhaFotoBase64 = "";
     idEdicao = null;
+    document.getElementById('btn-salvar').innerText = "SALVAR";
 }
 
 function buscar() { renderizarLista(document.getElementById('busca').value); }
