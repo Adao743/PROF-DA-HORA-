@@ -11,7 +11,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// 1. GERA OU RECUPERA O ID ÚNICO DESTE CELULAR
+// 1. IDENTIFICAÇÃO DO CELULAR (RG)
 let meuID = localStorage.getItem('usuario_id');
 if (!meuID) {
     meuID = 'user_' + Math.random().toString(36).substr(2, 9);
@@ -21,6 +21,7 @@ if (!meuID) {
 let capaBase64 = "";
 let perfilBase64 = "";
 
+// Captura de Imagens
 document.getElementById('fotoCapaInput').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (file) {
@@ -39,6 +40,7 @@ document.getElementById('fotoPerfilInput').addEventListener('change', function(e
     }
 });
 
+// Função Salvar
 async function salvarCadastro() {
     const nome = document.getElementById('nome').value;
     const prof = document.getElementById('profissao').value;
@@ -52,32 +54,44 @@ async function salvarCadastro() {
 
     try {
         await db.collection("profissionais").add({
-            nome, profissao: prof, descricao: desc, whatsapp: whats,
+            nome, 
+            profissao: prof, 
+            descricao: desc, 
+            whatsapp: whats,
             fotoCapa: capaBase64,
             fotoPerfil: perfilBase64,
-            criadorID: meuID, // SALVA QUEM CRIOU
+            criadorID: meuID, 
             data: new Date()
         });
-        alert("✅ Cadastrado com sucesso na nuvem!");
+        alert("✅ Publicado com sucesso!");
         location.reload(); 
     } catch (error) {
         alert("Erro ao salvar: " + error.message);
     }
 }
 
+// FUNÇÃO CARREGAR LISTA - MOSTRA TUDO PARA TODOS
 function carregarLista() {
     const lista = document.getElementById('lista-profissionais');
+    
+    // Ouve o banco de dados em tempo real
     db.collection("profissionais").orderBy("data", "desc").onSnapshot((snapshot) => {
         lista.innerHTML = "";
+        
+        if (snapshot.empty) {
+            lista.innerHTML = "<p class='text-center text-gray-500'>Nenhum profissional cadastrado.</p>";
+            return;
+        }
+
         snapshot.forEach((doc) => {
             const p = doc.data();
             const id = doc.id;
             
-            // VERIFICA SE O CELULAR ATUAL É O DONO DO ANÚNCIO
+            // Verifica se este celular é o dono para mostrar o botão
             const ehDono = (p.criadorID === meuID);
 
             lista.innerHTML += `
-                <div class="card bg-white rounded-lg shadow-md overflow-hidden mb-6 border border-gray-200">
+                <div class="card-item bg-white rounded-lg shadow-md overflow-hidden mb-6 border border-gray-200">
                     <img src="${p.fotoCapa || 'https://via.placeholder.com/400x150?text=Trabalho'}" class="w-full h-32 object-cover">
                     <div class="px-4 pb-4">
                         <div class="flex flex-col items-center">
@@ -88,7 +102,6 @@ function carregarLista() {
                         <p class="text-gray-600 text-xs mt-3 mb-4 text-center italic border-t pt-2">${p.descricao}</p>
                         <div class="flex space-x-2">
                             ${ehDono ? `<button onclick="excluirPerfil('${id}')" class="flex-1 bg-gray-100 text-red-500 py-2 rounded text-xs font-bold">DELETAR</button>` : ''}
-                            
                             <a href="https://wa.me/${p.whatsapp}" target="_blank" class="flex-[2] block text-center bg-green-500 text-white py-2 rounded-md font-bold text-sm">WHATSAPP</a>
                         </div>
                     </div>
@@ -98,6 +111,7 @@ function carregarLista() {
     });
 }
 
+// Função Excluir
 async function excluirPerfil(id) {
     if (confirm("Deseja realmente remover seu cadastro?")) {
         try {
@@ -107,11 +121,18 @@ async function excluirPerfil(id) {
     }
 }
 
+// FUNÇÃO FILTRAR - CORRIGIDA PARA NÃO SUMIR COM OS CARDS
 function filtrar() {
     const termo = document.getElementById('inputPesquisa').value.toLowerCase();
-    const cards = document.getElementsByClassName('card');
+    const cards = document.getElementsByClassName('card-item');
+    
     for (let card of cards) {
-        card.style.display = card.innerText.toLowerCase().includes(termo) ? "block" : "none";
+        const textoCard = card.innerText.toLowerCase();
+        if (textoCard.includes(termo)) {
+            card.style.display = "block";
+        } else {
+            card.style.display = "none";
+        }
     }
 }
 
