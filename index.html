@@ -7,30 +7,41 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <style>
+        .perfil-img { width: 80px; height: 80px; border: 4px solid white; margin-top: -40px; }
+    </style>
 </head>
 <body class="bg-gray-100 p-2">
     <div class="max-w-md mx-auto space-y-4">
         
-        <div class="bg-white p-6 rounded-xl shadow-md text-center">
-            <h1 class="text-2xl font-bold text-blue-700 mb-4">PROF DA HORA</h1>
+        <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-md">
+            <h1 class="text-xl font-bold text-blue-700">PROF DA HORA</h1>
+            <button onclick="window.close()" class="bg-red-500 text-white px-4 py-1 rounded font-bold text-sm">SAIR</button>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-md">
             <div id="formulario" class="space-y-3">
                 <input type="text" id="nome" placeholder="Nome" class="w-full p-2 border rounded">
                 <input type="text" id="profissao" placeholder="Profissão" class="w-full p-2 border rounded">
                 <textarea id="descricao" placeholder="Descrição" class="w-full p-2 border rounded"></textarea>
                 <input type="text" id="whatsapp" placeholder="WhatsApp" class="w-full p-2 border rounded">
-                <input type="file" id="fotoInput" accept="image/*" class="w-full text-sm">
-                <button onclick="salvarCadastro()" class="w-full bg-blue-600 text-white p-3 rounded-lg font-bold">PUBLICAR</button>
+                
+                <label class="text-xs font-bold text-gray-600">FOTO DE CAPA (TRABALHO):</label>
+                <input type="file" id="fotoCapaInput" accept="image/*" class="w-full text-sm mb-2">
+                
+                <label class="text-xs font-bold text-gray-600">FOTO DE PERFIL (ROSTO):</label>
+                <input type="file" id="fotoPerfilInput" accept="image/*" class="w-full text-sm">
+                
+                <button onclick="salvarCadastro()" class="w-full bg-blue-600 text-white p-3 rounded-lg font-bold mt-4">PUBLICAR</button>
             </div>
         </div>
 
         <div class="bg-white p-4 rounded-xl shadow-md">
-            <input type="text" id="inputPesquisa" onkeyup="filtrar()" placeholder="🔍 Buscar profissional ou serviço..." class="w-full p-3 border-2 border-blue-100 rounded-lg focus:border-blue-500 outline-none">
+            <input type="text" id="inputPesquisa" onkeyup="filtrar()" placeholder="🔍 Buscar profissional..." class="w-full p-3 border rounded-lg outline-none">
         </div>
 
-        <div id="lista-profissionais" class="space-y-4 pb-10">
-            </div>
+        <div id="lista-profissionais" class="space-y-4 pb-10"></div>
     </div>
-
     <script src="script.js" defer></script>
 </body>
 </html>
