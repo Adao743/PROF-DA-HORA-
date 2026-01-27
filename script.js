@@ -12,19 +12,29 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-let fotoBase64 = "";
+let capaBase64 = "";
+let perfilBase64 = "";
 
-// Converte a foto escolhida
-document.getElementById('fotoInput').addEventListener('change', function(e) {
+// Converte a Foto de Capa
+document.getElementById('fotoCapaInput').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (file) {
         const reader = new FileReader();
-        reader.onload = (event) => { fotoBase64 = event.target.result; };
+        reader.onload = (event) => { capaBase64 = event.target.result; };
         reader.readAsDataURL(file);
     }
 });
 
-// Salva no Banco de Dados com a sua mensagem personalizada
+// Converte a Foto de Perfil
+document.getElementById('fotoPerfilInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => { perfilBase64 = event.target.result; };
+        reader.readAsDataURL(file);
+    }
+});
+
 async function salvarCadastro() {
     const nome = document.getElementById('nome').value;
     const prof = document.getElementById('profissao').value;
@@ -39,7 +49,8 @@ async function salvarCadastro() {
     try {
         await db.collection("profissionais").add({
             nome, profissao: prof, descricao: desc, whatsapp: whats,
-            foto: fotoBase64,
+            fotoCapa: capaBase64,
+            fotoPerfil: perfilBase64,
             data: new Date()
         });
         alert("✅ Cadastrado com sucesso na nuvem!");
@@ -49,7 +60,6 @@ async function salvarCadastro() {
     }
 }
 
-// Carrega a lista com botões de Editar e Deletar
 function carregarLista() {
     const lista = document.getElementById('lista-profissionais');
     db.collection("profissionais").orderBy("data", "desc").onSnapshot((snapshot) => {
@@ -58,18 +68,22 @@ function carregarLista() {
             const p = doc.data();
             const id = doc.id;
             lista.innerHTML += `
-                <div class="card bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 mb-4">
-                    <img src="${p.foto || 'https://via.placeholder.com/400x150?text=Sem+Foto'}" class="w-full h-40 object-cover">
-                    <div class="p-4">
-                        <h3 class="font-bold text-lg">${p.nome}</h3>
-                        <p class="text-blue-600 text-sm mb-2">${p.profissao}</p>
-                        <p class="text-gray-600 text-xs mb-4">${p.descricao}</p>
-                        
-                        <div class="flex space-x-2 mb-3">
-                            <button onclick="excluirPerfil('${id}')" class="flex-1 bg-gray-200 text-red-600 py-1 rounded text-xs font-bold">DELETAR</button>
+                <div class="card bg-white rounded-lg shadow-md overflow-hidden mb-6 border border-gray-200">
+                    <img src="${p.fotoCapa || 'https://via.placeholder.com/400x150?text=Trabalho'}" class="w-full h-32 object-cover">
+                    
+                    <div class="px-4 pb-4">
+                        <div class="flex flex-col items-center">
+                            <img src="${p.fotoPerfil || 'https://via.placeholder.com/80?text=Foto'}" class="w-20 h-20 rounded-full border-4 border-white shadow-md -mt-10 object-cover bg-gray-200">
+                            <h3 class="font-bold text-lg mt-2 text-gray-800">${p.nome}</h3>
+                            <p class="text-blue-600 text-sm font-bold">${p.profissao}</p>
                         </div>
-
-                        <a href="https://wa.me/${p.whatsapp}" target="_blank" class="block text-center bg-green-500 text-white py-2 rounded-md font-bold text-sm">WHATSAPP</a>
+                        
+                        <p class="text-gray-600 text-xs mt-3 mb-4 text-center italic border-t pt-2">${p.descricao}</p>
+                        
+                        <div class="flex space-x-2">
+                            <button onclick="excluirPerfil('${id}')" class="flex-1 bg-gray-100 text-red-500 py-2 rounded text-xs font-bold">DELETAR</button>
+                            <a href="https://wa.me/${p.whatsapp}" target="_blank" class="flex-[2] block text-center bg-green-500 text-white py-2 rounded-md font-bold text-sm">WHATSAPP</a>
+                        </div>
                     </div>
                 </div>
             `;
@@ -77,19 +91,12 @@ function carregarLista() {
     });
 }
 
-// Função para Deletar
 async function excluirPerfil(id) {
-    if (confirm("Tem certeza que deseja apagar este cadastro das nuvens?")) {
-        try {
-            await db.collection("profissionais").doc(id).delete();
-            alert("Removido com sucesso!");
-        } catch (e) {
-            alert("Erro ao excluir: " + e.message);
-        }
+    if (confirm("Deseja apagar este cadastro?")) {
+        try { await db.collection("profissionais").doc(id).delete(); } catch (e) { alert(e.message); }
     }
 }
 
-// Função de Pesquisa
 function filtrar() {
     const termo = document.getElementById('inputPesquisa').value.toLowerCase();
     const cards = document.getElementsByClassName('card');
