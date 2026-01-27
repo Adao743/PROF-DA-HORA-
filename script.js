@@ -3,7 +3,7 @@ const firebaseConfig = {
   authDomain: "prof-da-hora.firebaseapp.com",
   projectId: "prof-da-hora",
   storageBucket: "prof-da-hora.firebasestorage.app",
-  messagingSenderId: "+555399254363",
+  messagingSenderId: "555399254363",
   appId: "1:124661519863:web:600d142f499a0d5c43d810",
   measurementId: "G-37CWFVZQ9"
 };
@@ -131,10 +131,14 @@ function carregarLista() {
 
 // 6. FUNÇÃO DENUNCIAR (MUDE O SEU WHATSAPP AQUI)
 function denunciarConteudo(nome, id) {
-    const meuWhats = "55XXXXXXXXXXX"; // <-- COLOQUE SEU NUMERO AQUI
-    const mensagem = `🚨 *DENÚNCIA* 🚨%0A%0APerfil: *${nome}*%0AID: ${id}`;
-    if(confirm("Deseja denunciar este perfil ao administrador?")) {
-        window.open(`https://wa.me/${meuWhats}?text=${mensagem}`, '_blank');
+    // IMPORTANTE: Use apenas números, sem espaços, parênteses ou o sinal de +
+    const meuWhats = "555399254363"; // COLOQUE SEU NÚMERO AQUI
+    const texto = encodeURIComponent(`🚨 DENÚNCIA: Perfil: ${nome} | ID: ${id}`);
+    
+    if(confirm("Deseja denunciar este perfil?")) {
+        window.open(`https://api.whatsapp.com/send?phone=${meuWhats}&text=${texto}`, '_blank');
+    }
+}
     }
 }
 
