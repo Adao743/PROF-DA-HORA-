@@ -3,7 +3,7 @@ const firebaseConfig = {
   authDomain: "prof-da-hora.firebaseapp.com",
   projectId: "prof-da-hora",
   storageBucket: "prof-da-hora.firebasestorage.app",
-  messagingSenderId: "05399254363",
+  messagingSenderId: "+555399254363",
   appId: "1:124661519863:web:600d142f499a0d5c43d810",
   measurementId: "G-37CWFVZQ9"
 };
