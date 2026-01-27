@@ -2,6 +2,7 @@ let profissionais = JSON.parse(localStorage.getItem('prof_da_hora_data')) || [];
 let minhaFotoBase64 = "";
 let idEdicao = null;
 
+// 1. Funções de Navegação
 function fazerLogin() {
     const check = document.getElementById('aceite-termos');
     if (check && check.checked) {
@@ -18,52 +19,76 @@ function sairApp() {
     document.getElementById('tela-login').classList.remove('hidden');
 }
 
-document.getElementById('foto').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    const reader = new FileReader();
-    reader.onload = function(event) {
-        const img = new Image();
-        img.onload = function() {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = 300; canvas.height = 300;
-            ctx.drawImage(img, 0, 0, 300, 300);
-            minhaFotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
-            document.getElementById('preview-foto').innerHTML = `<img src="${minhaFotoBase64}" class="w-full h-full object-cover">`;
-        }
-        img.src = event.target.result;
-    };
-    reader.readAsDataURL(file);
-});
+// 2. Lógica da Foto (Onde o mestre brilha!)
+const inputFoto = document.getElementById('foto');
+if (inputFoto) {
+    inputFoto.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = 300; canvas.height = 300;
+                ctx.drawImage(img, 0, 0, 300, 300);
+                minhaFotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
+                document.getElementById('preview-foto').innerHTML = `<img src="${minhaFotoBase64}" class="w-full h-full object-cover">`;
+            }
+            img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+    });
+}
 
+// 3. Salvar Cadastro (Ajustado para os seus IDs)
 function salvarCadastro() {
     const nome = document.getElementById('nome').value;
     const prof = document.getElementById('profissao').value;
     const desc = document.getElementById('descricao').value;
     const whats = document.getElementById('whatsapp').value;
 
-    if (!nome || !prof || !whats) return alert("Preencha os campos!");
+    if (!nome || !prof || !whats) {
+        alert("Por favor, preencha Nome, Profissão e WhatsApp.");
+        return;
+    }
 
     if (idEdicao) {
         const index = profissionais.findIndex(p => p.id === idEdicao);
-        profissionais[index] = { ...profissionais[index], nome, profissao: prof, descricao: desc, whatsapp: whats, foto: minhaFotoBase64 || profissionais[index].foto };
+        if (index !== -1) {
+            profissionais[index] = { ...profissionais[index], nome, profissao: prof, descricao: desc, whatsapp: whats, foto: minhaFotoBase64 || profissionais[index].foto };
+        }
         idEdicao = null;
     } else {
-        // Simples: adiciona o novo profissional
-        profissionais.push({ id: Date.now(), nome, profissao: prof, descricao: desc, whatsapp: whats, foto: minhaFotoBase64, likes: 0 });
+        // Cria novo
+        const novo = {
+            id: Date.now(),
+            nome: nome,
+            profissao: prof,
+            descricao: desc,
+            whatsapp: whats,
+            foto: minhaFotoBase64,
+            likes: 0
+        };
+        profissionais.push(novo);
     }
 
     localStorage.setItem('prof_da_hora_data', JSON.stringify(profissionais));
-    limparCampos(); 
+    limparCampos();
     renderizarLista();
-    alert("Dados salvos!");
+    alert("Salvo com sucesso!");
 }
 
+// 4. Renderizar a Lista na Tela
 function renderizarLista(filtro = "") {
     const lista = document.getElementById('lista-publica');
-    if(!lista) return;
+    if (!lista) return;
     lista.innerHTML = '';
-    const filtrados = profissionais.filter(p => p.nome.toLowerCase().includes(filtro.toLowerCase()) || p.profissao.toLowerCase().includes(filtro.toLowerCase()));
+
+    const filtrados = profissionais.filter(p => 
+        p.nome.toLowerCase().includes(filtro.toLowerCase()) || 
+        p.profissao.toLowerCase().includes(filtro.toLowerCase())
+    );
 
     filtrados.forEach(p => {
         lista.innerHTML += `
@@ -86,18 +111,21 @@ function renderizarLista(filtro = "") {
     });
 }
 
+// 5. Funções de Apoio
 function prepararEdicao(id) {
     const p = profissionais.find(prof => prof.id === id);
-    document.getElementById('nome').value = p.nome;
-    document.getElementById('profissao').value = p.profissao;
-    document.getElementById('descricao').value = p.descricao;
-    document.getElementById('whatsapp').value = p.whatsapp;
-    idEdicao = id;
-    window.scrollTo(0, 0);
+    if (p) {
+        document.getElementById('nome').value = p.nome;
+        document.getElementById('profissao').value = p.profissao;
+        document.getElementById('descricao').value = p.descricao;
+        document.getElementById('whatsapp').value = p.whatsapp;
+        idEdicao = id;
+        window.scrollTo(0, 0);
+    }
 }
 
 function deletarUm(id) {
-    if (confirm("Remover este profissional?")) {
+    if (confirm("Deseja remover este cadastro?")) {
         profissionais = profissionais.filter(p => p.id !== id);
         localStorage.setItem('prof_da_hora_data', JSON.stringify(profissionais));
         renderizarLista();
@@ -114,8 +142,15 @@ function limparCampos() {
     idEdicao = null;
 }
 
-function buscar() { renderizarLista(document.getElementById('busca').value); }
-function darLike(id) { 
+function buscar() {
+    renderizarLista(document.getElementById('busca').value);
+}
+
+function darLike(id) {
     const p = profissionais.find(prof => prof.id === id);
-    if(p) { p.likes++; localStorage.setItem('prof_da_hora_data', JSON.stringify(profissionais)); renderizarLista(); }
+    if (p) {
+        p.likes++;
+        localStorage.setItem('prof_da_hora_data', JSON.stringify(profissionais));
+        renderizarLista(document.getElementById('busca').value);
+    }
 }
