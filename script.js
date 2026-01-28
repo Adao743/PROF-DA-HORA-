@@ -11,13 +11,14 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+// Verifica se é admin
 const modoAdmin = localStorage.getItem('admin_key') === "2505";
 
-// 1. FUNÇÃO SAIR (Ajustada para o nome que você usa)
+// FUNÇÃO SAIR (AGORA VAI LIMPAR TUDO)
 function sairAdmin() {
     localStorage.removeItem('admin_key');
-    alert("Saída realizada!");
-    location.reload();
+    alert("Você saiu do modo administrativo.");
+    window.location.href = window.location.href; // Força o recarregamento total
 }
 
 function ativarAdmin() {
@@ -31,29 +32,30 @@ function ativarAdmin() {
     }
 }
 
-// 2. FUNÇÃO PUBLICAR (O motor que estava faltando!)
+// FUNÇÃO PUBLICAR CORRIGIDA
 async function salvarCadastro() {
-    const nome = document.getElementById('nome').value;
-    const profissao = document.getElementById('profissao').value;
-    const descricao = document.getElementById('descricao').value;
-    const whatsapp = document.getElementById('whatsapp').value;
-    const fotoCapa = document.getElementById('fotoCapaInput').files[0];
-    const fotoPerfil = document.getElementById('fotoPerfilInput').files[0];
+    try {
+        const nome = document.getElementById('nome').value;
+        const profissao = document.getElementById('profissao').value;
+        const descricao = document.getElementById('descricao').value;
+        const whatsapp = document.getElementById('whatsapp').value;
+        const fCapa = document.getElementById('fotoCapaInput').files[0];
+        const fPerfil = document.getElementById('fotoPerfilInput').files[0];
 
-    if (!nome || !profissao || !fotoCapa || !fotoPerfil) {
-        alert("Preencha todos os campos e selecione as fotos!");
-        return;
-    }
+        if (!nome || !profissao || !fCapa || !fPerfil) {
+            alert("Por favor, preencha nome, profissão e selecione as duas fotos.");
+            return;
+        }
 
-    // Transformar fotos em texto (Base64)
-    const readerCapa = new FileReader();
-    readerCapa.onload = async function() {
-        const base64Capa = readerCapa.result;
-        const readerPerfil = new FileReader();
-        readerPerfil.onload = async function() {
-            const base64Perfil = readerPerfil.result;
-            
-            try {
+        const reader1 = new FileReader();
+        reader1.readAsDataURL(fCapa);
+        reader1.onload = () => {
+            const base64Capa = reader1.result;
+            const reader2 = new FileReader();
+            reader2.readAsDataURL(fPerfil);
+            reader2.onload = async () => {
+                const base64Perfil = reader2.result;
+                
                 await db.collection("profissionais").add({
                     nome, profissao, descricao, whatsapp,
                     fotoCapa: base64Capa,
@@ -62,25 +64,18 @@ async function salvarCadastro() {
                 });
                 alert("✅ PUBLICADO COM SUCESSO!");
                 location.reload();
-            } catch (e) {
-                alert("Erro ao salvar: " + e.message);
-            }
+            };
         };
-        readerPerfil.readAsDataURL(fotoPerfil);
-    };
-    readerCapa.readAsDataURL(fotoCapa);
+    } catch (erro) {
+        alert("Erro na publicação: " + erro.message);
+    }
 }
 
-// 3. FUNÇÃO DENÚNCIA (Com a mensagem automática)
+// FUNÇÃO DENÚNCIA COM O NÚMERO NOVO
 function denunciar(nome, id) {
-    const seuWhats = "5553991244587"; 
-    // O segredo está no "text="
-    const mensagem = `🚨 *DENÚNCIA PROF DA HORA*%0A*Nome:* ${nome}%0A*ID:* ${id}`;
-    const link = `https://wa.me/${seuWhats}?text=${mensagem}`;
-    
-    if(confirm("Deseja enviar denúncia para o administrador?")) {
-        window.open(link, '_blank');
-    }
+    const numeroAdm = "5553999254363"; 
+    const texto = `🚨 *DENÚNCIA PROF DA HORA*%0A*Perfil:* ${nome}%0A*ID:* ${id}`;
+    window.open(`https://wa.me/${numeroAdm}?text=${texto}`, '_blank');
 }
 
 async function carregarLista() {
