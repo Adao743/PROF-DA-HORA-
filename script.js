@@ -125,3 +125,12 @@ function ativarAdmin() {
 }
 
 carregarLista();
+// O interruptor: liga e desliga o formulário
+function toggleForm() {
+    const form = document.getElementById('form-cadastro');
+    if (form.style.display === "none") {
+        form.style.display = "block";
+    } else {
+        form.style.display = "none";
+    }
+}
