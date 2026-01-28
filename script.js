@@ -1,3 +1,4 @@
+// 1. CONFIGURAÇÃO (Sempre no topo)
 const firebaseConfig = {
   apiKey: "AIzaSyBm9dy9MXr9Lg3lNqLX5wzMYuy5i_Q8Hdc",
   authDomain: "prof-da-hora.firebaseapp.com",
@@ -7,11 +8,10 @@ const firebaseConfig = {
   appId: "1:124661519863:web:600d142f499a0d5c43d810",
   measurementId: "G-37CWFVZQ9"
 };
-
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// Verifica se é admin pelo localStorage
+// 2. CONTROLE DE ADMIN
 const modoAdmin = localStorage.getItem('admin_key') === "2505";
 
 function ativarAdmin() {
@@ -31,38 +31,14 @@ function sairAdmin() {
     location.reload();
 }
 
-async function salvarCadastro() {
-    const nome = document.getElementById('nome').value;
-    const profissao = document.getElementById('profissao').value;
-    const descricao = document.getElementById('descricao').value;
-    const whatsapp = document.getElementById('whatsapp').value;
-    const fotoCapa = document.getElementById('fotoCapaInput').files[0];
-    const fotoPerfil = document.getElementById('fotoPerfilInput').files[0];
-
-    if (!nome || !profissao || !fotoCapa || !fotoPerfil) {
-        alert("Preencha tudo e selecione as fotos!");
-        return;
-    }
-
-    const readerCapa = new FileReader();
-    readerCapa.onload = async function() {
-        const base64Capa = readerCapa.result;
-        const readerPerfil = new FileReader();
-        readerPerfil.onload = async function() {
-            const base64Perfil = readerPerfil.result;
-            await db.collection("profissionais").add({
-                nome, profissao, descricao, whatsapp,
-                fotoCapa: base64Capa, fotoPerfil: base64Perfil,
-                data: new Date()
-            });
-            alert("✅ Publicado!");
-            location.reload();
-        };
-        readerPerfil.readAsDataURL(fotoPerfil);
-    };
-    readerCapa.readAsDataURL(fotoCapa);
+// 3. FUNÇÃO DE DENÚNCIA (Importante estar separada)
+function denunciar(nome, id) {
+    const seuWhats = "5553991244587"; 
+    const msg = encodeURIComponent(`🚨 DENÚNCIA\nNome: ${nome}\nID: ${id}`);
+    window.open(`https://wa.me/${seuWhats}?text=${msg}`);
 }
 
+// 4. CARREGAR A LISTA (Onde os botões são criados)
 async function carregarLista() {
     const querySnapshot = await db.collection("profissionais").orderBy("data", "desc").get();
     const lista = document.getElementById('lista-profissionais');
@@ -79,27 +55,29 @@ async function carregarLista() {
                     <h2 class="text-xl font-bold mt-2">${p.nome}</h2>
                     <p class="text-blue-600 font-bold">${p.profissao}</p>
                     <p class="text-gray-600 text-sm text-center mt-2">${p.descricao}</p>
+                    
                     <div class="flex gap-2 mt-4 w-full">
                         <a href="https://wa.me/${p.whatsapp.replace(/\D/g,'')}" target="_blank" class="flex-1 bg-green-500 text-white text-center py-2 rounded-lg font-bold">WHATSAPP</a>
+                        
                         <button onclick="denunciar('${p.nome}', '${id}')" class="bg-gray-100 text-gray-500 px-2 py-1 rounded text-[10px]">DENUNCIAR</button>
                     </div>
+
                     ${modoAdmin ? `<button onclick="remover('${id}')" class="w-full bg-red-600 text-white py-2 rounded-lg mt-2 font-bold">APAGAR POST</button>` : ""}
                 </div>
             </div>`;
     });
 }
 
-function denunciar(nome, id) {
-    const seuWhats = "5553991244587"; // Coloque seu número real aqui
-    const msg = encodeURIComponent(`🚨 DENÚNCIA\nNome: ${nome}\nID: ${id}`);
-    window.open(`https://wa.me/${seuWhats}?text=${msg}`);
-}
-
+// 5. OUTRAS FUNÇÕES (Remover, Salvar, Filtrar)
 async function remover(id) {
     if(confirm("Apagar anúncio?")) {
         await db.collection("profissionais").doc(id).delete();
         carregarLista();
     }
+}
+
+async function salvarCadastro() {
+    // ... (mantenha sua função de salvar aqui)
 }
 
 function filtrar() {
@@ -110,4 +88,5 @@ function filtrar() {
     }
 }
 
+// Inicia tudo
 carregarLista();
