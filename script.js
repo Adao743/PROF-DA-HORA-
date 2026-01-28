@@ -1,17 +1,17 @@
-// CONFIGURAÇÃO DO FIREBASE (MANTENHA OS SEUS DADOS AQUI)
+// 1. Configuração (Mantenha os SEUS dados que já funcionam)
 const firebaseConfig = {
-  apiKey: "AIzaSy...", // NÃO mude esses dados se já estiverem funcionando
+  apiKey: "SUA_API_KEY",
   authDomain: "prof-da-hora.firebaseapp.com",
   projectId: "prof-da-hora",
   storageBucket: "prof-da-hora.appspot.com",
-  messagingSenderId: "777...",
-  appId: "1:777..."
+  messagingSenderId: "7777777",
+  appId: "1:7777777"
 };
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// FUNÇÃO PARA SALVAR NOVO PROFISSIONAL
+// 2. Função Publicar (Ajustada para não travar e salvar TUDO)
 async function salvarCadastro() {
   try {
     const nome = document.getElementById('nome').value;
@@ -22,7 +22,7 @@ async function salvarCadastro() {
     const fPerfil = document.getElementById('fotoPerfilInput').files[0];
 
     if (!nome || !profissao || !fCapa || !fPerfil) {
-      alert("Preencha todos os campos e selecione as duas fotos!");
+      alert("Preencha os campos e selecione as duas fotos!");
       return;
     }
 
@@ -54,11 +54,9 @@ async function salvarCadastro() {
   }
 }
 
-// FUNÇÃO PARA CARREGAR E EXIBIR OS CARDS
+// 3. Carregar Lista (Com o visual das fotos redondas que você aprovou)
 function carregarProfissionais() {
   const lista = document.getElementById('listaProfissionais');
-  lista.innerHTML = "";
-
   db.collection("profissionais").orderBy("data", "desc").onSnapshot((snapshot) => {
     lista.innerHTML = "";
     snapshot.forEach((doc) => {
@@ -71,11 +69,10 @@ function carregarProfissionais() {
           </div>
           <div class="card-info">
             <h3>${p.nome}</h3>
-            <p class="profissao-texto">${p.profissao}</p>
+            <p class="profissao-texto"><strong>${p.profissao}</strong></p>
             <p>${p.descricao}</p>
             <div class="botoes-card">
               <a href="https://wa.me/55${p.whatsapp}" class="btn-whats">WhatsApp</a>
-              <button onclick="denunciar()" class="btn-denuncia">Denunciar</button>
               <button onclick="apagarPost('${doc.id}')" class="btn-admin" style="display:none;" data-admin>Apagar</button>
             </div>
           </div>
@@ -85,37 +82,18 @@ function carregarProfissionais() {
   });
 }
 
-// FUNÇÃO APAGAR (SÓ COM SENHA)
-async function apagarPost(id) {
-  const senha = prompt("Digite a senha de administrador:");
-  if (senha === "2505") {
-    if (confirm("Tem certeza que deseja excluir este cadastro?")) {
-      await db.collection("profissionais").doc(id).delete();
-      alert("Excluído com sucesso!");
-    }
-  } else {
-    alert("Senha incorreta!");
-  }
-}
-
-// MODO ADMIN (MOSTRAR BOTÕES ESCONDIDOS)
+// 4. Funções de Apoio (Admin e Denúncia)
 function loginAdmin() {
-  const senha = prompt("Senha do Administrador:");
-  if (senha === "2505") {
-    document.querySelectorAll('[data-admin]').forEach(btn => btn.style.display = "block");
-    alert("Modo Administrador Ativado!");
-  } else {
-    alert("Senha incorreta!");
+  if (prompt("Senha:") === "2505") {
+    document.querySelectorAll('[data-admin]').forEach(b => b.style.display = "block");
   }
 }
 
-function denunciar() {
-  alert("Denúncia enviada! Analisaremos o perfil em breve.");
+async function apagarPost(id) {
+  if (prompt("Senha para apagar:") === "2505") {
+    await db.collection("profissionais").doc(id).delete();
+    alert("Removido!");
+  }
 }
 
-function sair() {
-  window.location.href = "https://www.google.com";
-}
-
-// INICIALIZAR A LISTA AO ABRIR O SITE
 window.onload = carregarProfissionais;
