@@ -17,12 +17,38 @@
 
     <div class="p-4 max-w-md mx-auto">
         
-        <div class="bg-white p-4 rounded-xl shadow-md mb-6">
-            <h2 class="font-bold mb-4 text-gray-700">Anunciar Profissional</h2>
-            <input type="text" id="nome" placeholder="Nome Completo" class="w-full border p-2 rounded mb-2">
-            <input type="text" id="profissao" placeholder="Sua Profissão" class="w-full border p-2 rounded mb-2">
-            <textarea id="descricao" placeholder="Pequeno resumo do seu trabalho" class="w-full border p-2 rounded mb-2"></textarea>
-            <input type="text" id="whatsapp" placeholder="WhatsApp (ex: 53999254363)" class="w-full border p-2 rounded mb-2">
+        <div class="max-w-md mx-auto"> 
+    <button onclick="toggleForm()" class="w-full bg-green-600 text-white py-3 rounded-xl font-bold mb-4 shadow-lg">
+        QUERO ME CADASTRAR
+    </button>
+
+    <div id="form-cadastro" style="display: none;">
+        <div class="bg-white p-4 rounded-xl shadow-md mb-6 border-2 border-green-100">
+            <h2 class="font-bold mb-4 text-gray-700 text-center">Novo Cadastro</h2>
+            
+            <input type="text" id="nome" placeholder="Nome Completo" class="w-full p-2 border rounded mb-2">
+            <input type="text" id="profissao" placeholder="Sua Profissão" class="w-full p-2 border rounded mb-2">
+            <textarea id="descricao" placeholder="Pequeno resumo do seu trabalho" class="w-full p-2 border rounded mb-2"></textarea>
+            <input type="text" id="whatsapp" placeholder="WhatsApp (ex: 53999254363)" class="w-full p-2 border rounded mb-2">
+
+            <label class="block text-xs text-gray-500 mb-1">Foto de Capa (Fundo):</label>
+            <input type="file" id="fotoCapaInput" class="w-full mb-2">
+
+            <label class="block text-xs text-gray-500 mb-1">Foto de Perfil (Rosto):</label>
+            <input type="file" id="fotoPerfilInput" class="w-full mb-4">
+
+            <button onclick="salvarCadastro()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold">
+                PUBLICAR AGORA
+            </button>
+            
+            <button onclick="toggleForm()" class="w-full text-red-500 mt-4 text-sm font-semibold">
+                ✖ CANCELAR / FECHAR
+            </button>
+        </div>
+    </div>
+
+    <div id="lista-profissionais"></div>
+</div>
             
             <label class="block text-xs text-gray-500 mb-1">Foto de Capa (Fundo):</label>
             <input type="file" id="fotoCapaInput" class="w-full mb-2 text-sm">
