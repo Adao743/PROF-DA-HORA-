@@ -13,74 +13,69 @@ const db = firebase.firestore();
 
 const modoAdmin = localStorage.getItem('admin_key') === "2505";
 
-// 1. FUNÇÃO SAIR (Agora sai do admin e fecha/redireciona o app)
+// 1. FUNÇÃO SAIR (Indo direto para o Google como você pediu)
 function sairGeral() {
     localStorage.removeItem('admin_key');
-    alert("Saindo do aplicativo...");
-    window.location.href = "https://www.google.com"; // Aqui você define para onde ele vai ao sair
+    window.location.href = "https://www.google.com";
 }
 
-function ativarAdmin() {
-    const senha = prompt("Digite a senha mestra:");
-    if (senha === "2505") {
-        localStorage.setItem('admin_key', "2505");
-        alert("🔓 Modo Administrador Ativado!");
-        location.reload();
-    } else {
-        alert("❌ Senha incorreta!");
-    }
-}
-
-// 2. FUNÇÃO PUBLICAR
-async function salvarCadastro() {
-    const nome = document.getElementById('nome').value;
-    const profissao = document.getElementById('profissao').value;
-    const descricao = document.getElementById('descricao').value;
-    const whatsapp = document.getElementById('whatsapp').value;
-    const fotoCapa = document.getElementById('fotoCapaInput').files[0];
-    const fotoPerfil = document.getElementById('fotoPerfilInput').files[0];
-
-    if (!nome || !profissao || !fotoCapa || !fotoPerfil) {
-        alert("Preencha todos os campos e selecione as fotos!");
-        return;
-    }
-
-    const readerCapa = new FileReader();
-    readerCapa.onload = async function() {
-        const base64Capa = readerCapa.result;
-        const readerPerfil = new FileReader();
-        readerPerfil.onload = async function() {
-            const base64Perfil = readerPerfil.result;
-            
-            try {
-                await db.collection("profissionais").add({
-                    nome, profissao, descricao, whatsapp,
-                    fotoCapa: base64Capa,
-                    fotoPerfil: base64Perfil,
-                    data: new Date()
-                });
-                alert("✅ PUBLICADO COM SUCESSO!");
-                location.reload();
-            } catch (e) {
-                alert("Erro ao salvar: " + e.message);
-            }
+// 2. MOTOR DE REDUZIR FOTO (Para não dar mais o erro de tamanho do print)
+async function reduzirFoto(arquivo) {
+    return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(arquivo);
+        reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const larguraMax = 600; // Reduz o tamanho da imagem
+                const escala = larguraMax / img.width;
+                canvas.width = larguraMax;
+                canvas.height = img.height * escala;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                resolve(canvas.toDataURL('image/jpeg', 0.6)); // Salva com 60% de qualidade
+            };
         };
-        readerPerfil.readAsDataURL(fotoPerfil);
-    };
-    readerCapa.readAsDataURL(fotoCapa);
+    });
 }
 
-// 3. FUNÇÃO DENÚNCIA (Ajustada para o seu número final)
-function denunciar(nome, id) {
-    const seuWhats = "5553999254363"; 
-    const mensagem = `🚨 *DENÚNCIA PROF DA HORA*%0A*Profissional:* ${nome}%0A*ID do Post:* ${id}`;
-    const link = `https://api.whatsapp.com/send?phone=${seuWhats}&text=${mensagem}`;
-    
-    if(confirm("Deseja enviar denúncia para o administrador?")) {
-        window.open(link, '_blank');
+// 3. SALVAR CADASTRO (Com as correções de fotos e descrição)
+async function salvarCadastro() {
+    try {
+        const nome = document.getElementById('nome').value;
+        const profissao = document.getElementById('profissao').value;
+        const descricao = document.getElementById('descricao').value;
+        const whatsapp = document.getElementById('whatsapp').value;
+        const fCapa = document.getElementById('fotoCapaInput').files[0];
+        const fPerfil = document.getElementById('fotoPerfilInput').files[0];
+
+        if (!nome || !fCapa || !fPerfil) {
+            alert("Preencha o nome e selecione as fotos!");
+            return;
+        }
+
+        alert("Processando fotos... Aguarde um instante.");
+        
+        const base64Capa = await reduzirFoto(fCapa);
+        const base64Perfil = await reduzirFoto(fPerfil);
+
+        await db.collection("profissionais").add({
+            nome, profissao, descricao, whatsapp,
+            fotoCapa: base64Capa,
+            fotoPerfil: base64Perfil,
+            data: new Date()
+        });
+
+        alert("✅ PUBLICADO COM SUCESSO!");
+        location.reload();
+    } catch (e) {
+        alert("Erro técnico: " + e.message);
     }
 }
 
+// 4. CARREGAR LISTA (Mantendo o que já funciona)
 async function carregarLista() {
     const querySnapshot = await db.collection("profissionais").orderBy("data", "desc").get();
     const lista = document.getElementById('lista-profissionais');
@@ -107,18 +102,23 @@ async function carregarLista() {
     });
 }
 
+function denunciar(nome, id) {
+    const seuWhats = "5553999254363"; 
+    const msg = `🚨 DENÚNCIA: ${nome} (ID: ${id})`;
+    window.open(`https://api.whatsapp.com/send?phone=${seuWhats}&text=${encodeURIComponent(msg)}`, '_blank');
+}
+
 async function remover(id) {
     if(confirm("Apagar anúncio?")) {
         await db.collection("profissionais").doc(id).delete();
-        carregarLista();
+        location.reload();
     }
 }
 
-function filtrar() {
-    const termo = document.getElementById('inputPesquisa').value.toLowerCase();
-    const cards = document.getElementsByClassName('card-item');
-    for (let card of cards) {
-        card.style.display = card.innerText.toLowerCase().includes(termo) ? "block" : "none";
+function ativarAdmin() {
+    if (prompt("Senha:") === "2505") {
+        localStorage.setItem('admin_key', "2505");
+        location.reload();
     }
 }
 
