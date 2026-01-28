@@ -32,43 +32,48 @@ function ativarAdmin() {
     }
 }
 
-// FUNÇÃO PUBLICAR CORRIGIDA
+// FUNÇÃO PUBLICAR CORRIGIDA E COMPLETA
 async function salvarCadastro() {
-    try {
-        const nome = document.getElementById('nome').value;
-        const profissao = document.getElementById('profissao').value;
-        const descricao = document.getElementById('descricao').value;
-        const whatsapp = document.getElementById('whatsapp').value;
-        const fCapa = document.getElementById('fotoCapaInput').files[0];
-        const fPerfil = document.getElementById('fotoPerfilInput').files[0];
+  try {
+    const nome = document.getElementById('nome').value;
+    const profissao = document.getElementById('profissao').value;
+    const descricao = document.getElementById('descricao').value;
+    const whatsapp = document.getElementById('whatsapp').value;
+    const fCapa = document.getElementById('fotoCapaInput').files[0];
+    const fPerfil = document.getElementById('fotoPerfilInput').files[0];
 
-        if (!nome || !profissao || !fCapa || !fPerfil) {
-            alert("Por favor, preencha nome, profissão e selecione as duas fotos.");
-            return;
-        }
-
-        const reader1 = new FileReader();
-        reader1.readAsDataURL(fCapa);
-        reader1.onload = () => {
-            const base64Capa = reader1.result;
-            const reader2 = new FileReader();
-            reader2.readAsDataURL(fPerfil);
-            reader2.onload = async () => {
-                const base64Perfil = reader2.result;
-                
-                await db.collection("profissionais").add({
-                    nome, profissao, descricao, whatsapp,
-                    fotoCapa: base64Capa,
-                    fotoPerfil: base64Perfil,
-                    data: new Date()
-                });
-                alert("✅ PUBLICADO COM SUCESSO!");
-                location.reload();
-            };
-        };
-    } catch (erro) {
-        alert("Erro na publicação: " + erro.message);
+    if (!nome || !profissao || !fCapa || !fPerfil) {
+      alert("Por favor, preencha nome, profissão e selecione as duas fotos.");
+      return;
     }
+
+    const reader1 = new FileReader();
+    reader1.readAsDataURL(fCapa);
+    reader1.onload = () => {
+      const base64Capa = reader1.result;
+      const reader2 = new FileReader();
+      reader2.readAsDataURL(fPerfil);
+      reader2.onload = async () => {
+        const base64Perfil = reader2.result;
+
+        await db.collection("profissionais").add({
+          nome, 
+          profissao, 
+          descricao, 
+          whatsapp,
+          fotoCapa: base64Capa,
+          fotoPerfil: base64Perfil,
+          data: new Date()
+        });
+
+        alert("Publicado com sucesso!");
+        location.reload();
+      };
+    };
+  } catch (error) {
+    console.error("Erro ao salvar:", error);
+    alert("Erro ao publicar. Tente novamente.");
+  }
 }
 
 // FUNÇÃO DENÚNCIA COM O NÚMERO NOVO
