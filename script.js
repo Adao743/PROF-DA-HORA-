@@ -11,15 +11,29 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+// VERIFICAÇÃO DE SEGURANÇA (Só vira true se a senha for 2505)
 const modoAdmin = localStorage.getItem('admin_key') === "2505";
 
-// 1. FUNÇÃO SAIR (Indo direto para o Google como você pediu)
+// 1. FUNÇÃO SAIR (Limpa a senha e sai do app)
 function sairGeral() {
-    localStorage.removeItem('admin_key');
+    localStorage.removeItem('admin_key'); // Remove a permissão de admin
+    alert("Saindo...");
     window.location.href = "https://www.google.com";
 }
 
-// 2. MOTOR DE REDUZIR FOTO (Para não dar mais o erro de tamanho do print)
+// 2. FUNÇÃO ATIVAR ADMIN (Com senha)
+function ativarAdmin() {
+    const senha = prompt("Digite a senha mestra:");
+    if (senha === "2505") {
+        localStorage.setItem('admin_key', "2505");
+        alert("🔓 Modo Administrador Ativado!");
+        location.reload();
+    } else {
+        alert("❌ Senha incorreta!");
+    }
+}
+
+// 3. MOTOR DE REDUZIR FOTO (Evita o erro de tamanho)
 async function reduzirFoto(arquivo) {
     return new Promise((resolve) => {
         const reader = new FileReader();
@@ -29,19 +43,19 @@ async function reduzirFoto(arquivo) {
             img.src = event.target.result;
             img.onload = () => {
                 const canvas = document.createElement('canvas');
-                const larguraMax = 600; // Reduz o tamanho da imagem
+                const larguraMax = 600;
                 const escala = larguraMax / img.width;
                 canvas.width = larguraMax;
                 canvas.height = img.height * escala;
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                resolve(canvas.toDataURL('image/jpeg', 0.6)); // Salva com 60% de qualidade
+                resolve(canvas.toDataURL('image/jpeg', 0.6));
             };
         };
     });
 }
 
-// 3. SALVAR CADASTRO (Com as correções de fotos e descrição)
+// 4. SALVAR CADASTRO
 async function salvarCadastro() {
     try {
         const nome = document.getElementById('nome').value;
@@ -56,8 +70,6 @@ async function salvarCadastro() {
             return;
         }
 
-        alert("Processando fotos... Aguarde um instante.");
-        
         const base64Capa = await reduzirFoto(fCapa);
         const base64Perfil = await reduzirFoto(fPerfil);
 
@@ -75,7 +87,7 @@ async function salvarCadastro() {
     }
 }
 
-// 4. CARREGAR LISTA (Mantendo o que já funciona)
+// 5. CARREGAR LISTA (Aqui a segurança acontece!)
 async function carregarLista() {
     const querySnapshot = await db.collection("profissionais").orderBy("data", "desc").get();
     const lista = document.getElementById('lista-profissionais');
@@ -84,6 +96,13 @@ async function carregarLista() {
     querySnapshot.forEach((doc) => {
         const p = doc.data();
         const id = doc.id;
+        
+        // SÓ MOSTRA O BOTÃO DE APAGAR SE O MODO ADMIN FOR VERDADEIRO
+        let botaoApagar = "";
+        if (modoAdmin) {
+            botaoApagar = `<button onclick="remover('${id}')" class="w-full bg-red-600 text-white py-2 rounded-lg mt-2 font-bold">APAGAR POST</button>`;
+        }
+
         lista.innerHTML += `
             <div class="card-item bg-white rounded-xl shadow-lg overflow-hidden mb-4 p-3">
                 <img src="${p.fotoCapa}" class="w-full h-32 object-cover rounded-lg">
@@ -96,7 +115,7 @@ async function carregarLista() {
                         <a href="https://wa.me/55${p.whatsapp.replace(/\D/g,'')}" target="_blank" class="flex-1 bg-green-500 text-white text-center py-2 rounded-lg font-bold">WHATSAPP</a>
                         <button onclick="denunciar('${p.nome}', '${id}')" class="bg-gray-100 text-gray-500 px-2 py-1 rounded text-[10px]">DENUNCIAR</button>
                     </div>
-                    ${modoAdmin ? `<button onclick="remover('${id}')" class="w-full bg-red-600 text-white py-2 rounded-lg mt-2 font-bold">APAGAR POST</button>` : ""}
+                    ${botaoApagar}
                 </div>
             </div>`;
     });
@@ -111,13 +130,6 @@ function denunciar(nome, id) {
 async function remover(id) {
     if(confirm("Apagar anúncio?")) {
         await db.collection("profissionais").doc(id).delete();
-        location.reload();
-    }
-}
-
-function ativarAdmin() {
-    if (prompt("Senha:") === "2505") {
-        localStorage.setItem('admin_key', "2505");
         location.reload();
     }
 }
