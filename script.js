@@ -17,8 +17,8 @@ const modoAdmin = localStorage.getItem('admin_key') === "2505";
 // FUNÇÃO SAIR (AGORA VAI LIMPAR TUDO)
 function sairAdmin() {
     localStorage.removeItem('admin_key');
-    alert("Você saiu do modo administrativo.");
-    window.location.href = window.location.href; // Força o recarregamento total
+    alert("Saindo do sistema...");
+    window.location.href = "https://www.google.com"; 
 }
 
 function ativarAdmin() {
