@@ -38,6 +38,15 @@
         <div id="lista-profissionais"></div>
 
     </div>
+    // O interruptor: liga e desliga o formulário
+function toggleForm() {
+    const form = document.getElementById('form-cadastro');
+    if (form.style.display === "none") {
+        form.style.display = "block";
+    } else {
+        form.style.display = "none";
+    }
+}
 
     <script src="script.js"></script>
 </body>
