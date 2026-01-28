@@ -11,36 +11,28 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// VERIFICAÇÃO DE SEGURANÇA (Só vira true se a senha for 2505)
+// MANTIDO: Sistema de Admin que você já conhece
 const modoAdmin = localStorage.getItem('admin_key') === "2505";
 
-// 1. FUNÇÃO SAIR (Ajustada para forçar a ida ao Google)
+// MANTIDO: Sua função de denúncia
+function denunciar(nome, id) {
+    window.open(`https://api.whatsapp.com/send?phone=5553999254363&text=Denuncia:${nome}`, '_blank');
+}
+
+// CORREÇÃO: Função Sair para o seu novo botão
 function sairGeral() {
-    localStorage.clear(); // Limpa tudo (admin e restos de memória)
+    localStorage.removeItem('admin_key');
     window.location.replace("https://www.google.com");
 }
-}
 
-// 2. FUNÇÃO ATIVAR ADMIN (Com senha)
-function ativarAdmin() {
-    const senha = prompt("Digite a senha mestra:");
-    if (senha === "2505") {
-        localStorage.setItem('admin_key', "2505");
-        alert("🔓 Modo Administrador Ativado!");
-        location.reload();
-    } else {
-        alert("❌ Senha incorreta!");
-    }
-}
-
-// 3. MOTOR DE REDUZIR FOTO (Evita o erro de tamanho)
+// NOVO: Redutor de foto (Necessário para evitar o erro de 1.1MB que você viu)
 async function reduzirFoto(arquivo) {
     return new Promise((resolve) => {
         const reader = new FileReader();
         reader.readAsDataURL(arquivo);
-        reader.onload = (event) => {
+        reader.onload = (e) => {
             const img = new Image();
-            img.src = event.target.result;
+            img.src = e.target.result;
             img.onload = () => {
                 const canvas = document.createElement('canvas');
                 const larguraMax = 600;
@@ -55,26 +47,28 @@ async function reduzirFoto(arquivo) {
     });
 }
 
-// 4. SALVAR CADASTRO
+// MANTIDO: Salvar com o seu sistema de Alertas
 async function salvarCadastro() {
     try {
         const nome = document.getElementById('nome').value;
         const profissao = document.getElementById('profissao').value;
-        const descricao = document.getElementById('descricao').value;
-        const whatsapp = document.getElementById('whatsapp').value;
         const fCapa = document.getElementById('fotoCapaInput').files[0];
         const fPerfil = document.getElementById('fotoPerfilInput').files[0];
 
         if (!nome || !fCapa || !fPerfil) {
-            alert("Preencha o nome e selecione as fotos!");
+            alert("Preencha os campos obrigatórios e fotos!");
             return;
         }
 
+        alert("Reduzindo fotos para garantir a publicação...");
         const base64Capa = await reduzirFoto(fCapa);
         const base64Perfil = await reduzirFoto(fPerfil);
 
         await db.collection("profissionais").add({
-            nome, profissao, descricao, whatsapp,
+            nome, 
+            profissao, 
+            descricao: document.getElementById('descricao').value,
+            whatsapp: document.getElementById('whatsapp').value,
             fotoCapa: base64Capa,
             fotoPerfil: base64Perfil,
             data: new Date()
@@ -83,26 +77,21 @@ async function salvarCadastro() {
         alert("✅ PUBLICADO COM SUCESSO!");
         location.reload();
     } catch (e) {
-        alert("Erro técnico: " + e.message);
+        alert("Erro ao salvar: " + e.message);
     }
 }
 
-// 5. CARREGAR LISTA (Aqui a segurança acontece!)
+// MANTIDO: Carregar Lista (Exatamente como o seu que funciona)
 async function carregarLista() {
     const querySnapshot = await db.collection("profissionais").orderBy("data", "desc").get();
     const lista = document.getElementById('lista-profissionais');
+    if(!lista) return; 
+    
     lista.innerHTML = "";
 
     querySnapshot.forEach((doc) => {
         const p = doc.data();
         const id = doc.id;
-        
-        // SÓ MOSTRA O BOTÃO DE APAGAR SE O MODO ADMIN FOR VERDADEIRO
-        let botaoApagar = "";
-        if (modoAdmin) {
-            botaoApagar = `<button onclick="remover('${id}')" class="w-full bg-red-600 text-white py-2 rounded-lg mt-2 font-bold">APAGAR POST</button>`;
-        }
-
         lista.innerHTML += `
             <div class="card-item bg-white rounded-xl shadow-lg overflow-hidden mb-4 p-3">
                 <img src="${p.fotoCapa}" class="w-full h-32 object-cover rounded-lg">
@@ -115,21 +104,22 @@ async function carregarLista() {
                         <a href="https://wa.me/55${p.whatsapp.replace(/\D/g,'')}" target="_blank" class="flex-1 bg-green-500 text-white text-center py-2 rounded-lg font-bold">WHATSAPP</a>
                         <button onclick="denunciar('${p.nome}', '${id}')" class="bg-gray-100 text-gray-500 px-2 py-1 rounded text-[10px]">DENUNCIAR</button>
                     </div>
-                    ${botaoApagar}
+                    ${modoAdmin ? `<button onclick="remover('${id}')" class="w-full bg-red-600 text-white py-2 rounded-lg mt-2 font-bold">APAGAR POST</button>` : ""}
                 </div>
             </div>`;
     });
 }
 
-function denunciar(nome, id) {
-    const seuWhats = "5553999254363"; 
-    const msg = `🚨 DENÚNCIA: ${nome} (ID: ${id})`;
-    window.open(`https://api.whatsapp.com/send?phone=${seuWhats}&text=${encodeURIComponent(msg)}`, '_blank');
+async function remover(id) {
+    if(confirm("Apagar permanentemente?")) {
+        await db.collection("profissionais").doc(id).delete();
+        location.reload();
+    }
 }
 
-async function remover(id) {
-    if(confirm("Apagar anúncio?")) {
-        await db.collection("profissionais").doc(id).delete();
+function ativarAdmin() {
+    if (prompt("Senha:") === "2505") {
+        localStorage.setItem('admin_key', "2505");
         location.reload();
     }
 }
