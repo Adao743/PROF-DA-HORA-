@@ -13,11 +13,11 @@ const db = firebase.firestore();
 
 const modoAdmin = localStorage.getItem('admin_key') === "2505";
 
-// 1. FUNÇÃO SAIR (Ajustada para o nome que você usa)
-function sairAdmin() {
+// 1. FUNÇÃO SAIR (Agora sai do admin e fecha/redireciona o app)
+function sairGeral() {
     localStorage.removeItem('admin_key');
-    alert("Saída realizada!");
-    location.reload();
+    alert("Saindo do aplicativo...");
+    window.location.href = "https://www.google.com"; // Aqui você define para onde ele vai ao sair
 }
 
 function ativarAdmin() {
@@ -31,7 +31,7 @@ function ativarAdmin() {
     }
 }
 
-// 2. FUNÇÃO PUBLICAR (O motor que estava faltando!)
+// 2. FUNÇÃO PUBLICAR
 async function salvarCadastro() {
     const nome = document.getElementById('nome').value;
     const profissao = document.getElementById('profissao').value;
@@ -45,7 +45,6 @@ async function salvarCadastro() {
         return;
     }
 
-    // Transformar fotos em texto (Base64)
     const readerCapa = new FileReader();
     readerCapa.onload = async function() {
         const base64Capa = readerCapa.result;
@@ -71,12 +70,11 @@ async function salvarCadastro() {
     readerCapa.readAsDataURL(fotoCapa);
 }
 
-// 3. FUNÇÃO DENÚNCIA (Com a mensagem automática)
+// 3. FUNÇÃO DENÚNCIA (Ajustada para o seu número final)
 function denunciar(nome, id) {
-    const seuWhats = "5553991244587"; 
-    // O segredo está no "text="
-    const mensagem = `🚨 *DENÚNCIA PROF DA HORA*%0A*Nome:* ${nome}%0A*ID:* ${id}`;
-    const link = `https://wa.me/${seuWhats}?text=${mensagem}`;
+    const seuWhats = "5553999254363"; 
+    const mensagem = `🚨 *DENÚNCIA PROF DA HORA*%0A*Profissional:* ${nome}%0A*ID do Post:* ${id}`;
+    const link = `https://api.whatsapp.com/send?phone=${seuWhats}&text=${mensagem}`;
     
     if(confirm("Deseja enviar denúncia para o administrador?")) {
         window.open(link, '_blank');
@@ -100,7 +98,7 @@ async function carregarLista() {
                     <p class="text-blue-600 font-bold">${p.profissao}</p>
                     <p class="text-gray-600 text-sm text-center mt-2">${p.descricao}</p>
                     <div class="flex gap-2 mt-4 w-full">
-                        <a href="https://wa.me/${p.whatsapp.replace(/\D/g,'')}" target="_blank" class="flex-1 bg-green-500 text-white text-center py-2 rounded-lg font-bold">WHATSAPP</a>
+                        <a href="https://wa.me/55${p.whatsapp.replace(/\D/g,'')}" target="_blank" class="flex-1 bg-green-500 text-white text-center py-2 rounded-lg font-bold">WHATSAPP</a>
                         <button onclick="denunciar('${p.nome}', '${id}')" class="bg-gray-100 text-gray-500 px-2 py-1 rounded text-[10px]">DENUNCIAR</button>
                     </div>
                     ${modoAdmin ? `<button onclick="remover('${id}')" class="w-full bg-red-600 text-white py-2 rounded-lg mt-2 font-bold">APAGAR POST</button>` : ""}
