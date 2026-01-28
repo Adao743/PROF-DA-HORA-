@@ -90,7 +90,7 @@ async function carregarLista() {
             <div class="card-item bg-white rounded-xl shadow-lg overflow-hidden mb-4 p-3">
                 <img src="${p.fotoCapa}" class="w-full h-32 object-cover rounded-lg">
                 <div class="flex flex-col items-center mt-[-40px]">
-                    <img src="${p.fotoPerfil}" style="width: 80px !important; height: 80px !important; min-width: 80px !important; min-height: 80px !important; display: block !important;" class="rounded-full border-4 border-white object-cover bg-gray-200 shadow-md">
+                    <img src="${p.fotoPerfil || p.fotoCapa}" style="width: 80px !important; height: 80px !important; min-width: 80px !important; min-height: 80px !important; display: block !important;" class="rounded-full border-4 border-white object-cover bg-gray-200 shadow-md">
                     <h2 class="text-xl font-bold mt-2">${p.nome}</h2>
                     <p class="text-blue-600 font-bold">${p.profissao}</p>
                     <p class="text-gray-600 text-sm text-center mt-2">${p.descricao}</p>
