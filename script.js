@@ -75,7 +75,7 @@ async function salvarCadastro() {
         });
 
         alert("✅ PUBLICADO COM SUCESSO!");
-        location.reload();
+      toggleForm();  location.reload();
     } catch (e) {
         alert("Erro ao salvar: " + e.message);
     }
