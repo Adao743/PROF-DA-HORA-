@@ -1,4 +1,3 @@
-// 1. CONFIGURAÇÃO (Sempre no topo)
 const firebaseConfig = {
   apiKey: "AIzaSyBm9dy9MXr9Lg3lNqLX5wzMYuy5i_Q8Hdc",
   authDomain: "prof-da-hora.firebaseapp.com",
@@ -8,11 +7,18 @@ const firebaseConfig = {
   appId: "1:124661519863:web:600d142f499a0d5c43d810",
   measurementId: "G-37CWFVZQ9"
 };
+
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// 2. CONTROLE DE ADMIN
 const modoAdmin = localStorage.getItem('admin_key') === "2505";
+
+// 1. FUNÇÃO SAIR (Ajustada para o nome que você usa)
+function sairAdmin() {
+    localStorage.removeItem('admin_key');
+    alert("Saída realizada!");
+    location.reload();
+}
 
 function ativarAdmin() {
     const senha = prompt("Digite a senha mestra:");
@@ -25,20 +31,58 @@ function ativarAdmin() {
     }
 }
 
-function sairAdmin() {
-    localStorage.removeItem('admin_key');
-    alert("Saída realizada!");
-    location.reload();
+// 2. FUNÇÃO PUBLICAR (O motor que estava faltando!)
+async function salvarCadastro() {
+    const nome = document.getElementById('nome').value;
+    const profissao = document.getElementById('profissao').value;
+    const descricao = document.getElementById('descricao').value;
+    const whatsapp = document.getElementById('whatsapp').value;
+    const fotoCapa = document.getElementById('fotoCapaInput').files[0];
+    const fotoPerfil = document.getElementById('fotoPerfilInput').files[0];
+
+    if (!nome || !profissao || !fotoCapa || !fotoPerfil) {
+        alert("Preencha todos os campos e selecione as fotos!");
+        return;
+    }
+
+    // Transformar fotos em texto (Base64)
+    const readerCapa = new FileReader();
+    readerCapa.onload = async function() {
+        const base64Capa = readerCapa.result;
+        const readerPerfil = new FileReader();
+        readerPerfil.onload = async function() {
+            const base64Perfil = readerPerfil.result;
+            
+            try {
+                await db.collection("profissionais").add({
+                    nome, profissao, descricao, whatsapp,
+                    fotoCapa: base64Capa,
+                    fotoPerfil: base64Perfil,
+                    data: new Date()
+                });
+                alert("✅ PUBLICADO COM SUCESSO!");
+                location.reload();
+            } catch (e) {
+                alert("Erro ao salvar: " + e.message);
+            }
+        };
+        readerPerfil.readAsDataURL(fotoPerfil);
+    };
+    readerCapa.readAsDataURL(fotoCapa);
 }
 
-// 3. FUNÇÃO DE DENÚNCIA (Importante estar separada)
+// 3. FUNÇÃO DENÚNCIA (Com a mensagem automática)
 function denunciar(nome, id) {
     const seuWhats = "5553991244587"; 
-    const msg = encodeURIComponent(`🚨 DENÚNCIA\nNome: ${nome}\nID: ${id}`);
-    window.open(`https://wa.me/${seuWhats}?text=${msg}`);
+    // O segredo está no "text="
+    const mensagem = `🚨 *DENÚNCIA PROF DA HORA*%0A*Nome:* ${nome}%0A*ID:* ${id}`;
+    const link = `https://wa.me/${seuWhats}?text=${mensagem}`;
+    
+    if(confirm("Deseja enviar denúncia para o administrador?")) {
+        window.open(link, '_blank');
+    }
 }
 
-// 4. CARREGAR A LISTA (Onde os botões são criados)
 async function carregarLista() {
     const querySnapshot = await db.collection("profissionais").orderBy("data", "desc").get();
     const lista = document.getElementById('lista-profissionais');
@@ -55,29 +99,21 @@ async function carregarLista() {
                     <h2 class="text-xl font-bold mt-2">${p.nome}</h2>
                     <p class="text-blue-600 font-bold">${p.profissao}</p>
                     <p class="text-gray-600 text-sm text-center mt-2">${p.descricao}</p>
-                    
                     <div class="flex gap-2 mt-4 w-full">
                         <a href="https://wa.me/${p.whatsapp.replace(/\D/g,'')}" target="_blank" class="flex-1 bg-green-500 text-white text-center py-2 rounded-lg font-bold">WHATSAPP</a>
-                        
                         <button onclick="denunciar('${p.nome}', '${id}')" class="bg-gray-100 text-gray-500 px-2 py-1 rounded text-[10px]">DENUNCIAR</button>
                     </div>
-
                     ${modoAdmin ? `<button onclick="remover('${id}')" class="w-full bg-red-600 text-white py-2 rounded-lg mt-2 font-bold">APAGAR POST</button>` : ""}
                 </div>
             </div>`;
     });
 }
 
-// 5. OUTRAS FUNÇÕES (Remover, Salvar, Filtrar)
 async function remover(id) {
     if(confirm("Apagar anúncio?")) {
         await db.collection("profissionais").doc(id).delete();
         carregarLista();
     }
-}
-
-async function salvarCadastro() {
-    // ... (mantenha sua função de salvar aqui)
 }
 
 function filtrar() {
@@ -88,5 +124,4 @@ function filtrar() {
     }
 }
 
-// Inicia tudo
 carregarLista();
