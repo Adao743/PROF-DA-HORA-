@@ -1,124 +1,45 @@
-const firebaseConfig = {
-  apiKey: "AIzaSyBm9dy9MXr9Lg3lNqLX5wzMYuy5i_Q8Hdc",
-  authDomain: "prof-da-hora.firebaseapp.com",
-  projectId: "prof-da-hora",
-  storageBucket: "prof-da-hora.firebasestorage.app",
-  messagingSenderId: "124661519863",
-  appId: "1:124661519863:web:600d142f499a0d5c43d810",
-  measurementId: "G-37CWFVZQ9"
-};
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prof da Hora</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+    <div class="bg-blue-600 p-4 text-white flex justify-between items-center shadow-md">
+        <h1 class="font-bold text-xl" onclick="ativarAdmin()">Prof da Hora</h1>
+        <button onclick="sairGeral()" class="bg-red-500 px-4 py-1 rounded-lg font-bold text-sm">Sair</button>
+    </div>
 
-const modoAdmin = localStorage.getItem('admin_key') === "2505";
-
-// FUNÇÃO SAIR (Agora vai funcionar com o seu HTML novo)
-function sairGeral() {
-    localStorage.removeItem('admin_key');
-    window.location.replace("https://www.google.com");
-}
-
-// MOTOR PARA DIMINUIR A FOTO (Resolve o erro do seu print de 1.1MB)
-async function reduzirFoto(arquivo) {
-    return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(arquivo);
-        reader.onload = (e) => {
-            const img = new Image();
-            img.src = e.target.result;
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const larguraMax = 600;
-                const escala = larguraMax / img.width;
-                canvas.width = larguraMax;
-                canvas.height = img.height * escala;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                resolve(canvas.toDataURL('image/jpeg', 0.6));
-            };
-        };
-    });
-}
-
-async function salvarCadastro() {
-    try {
-        const nome = document.getElementById('nome').value;
-        const profissao = document.getElementById('profissao').value;
-        const descricao = document.getElementById('descricao').value;
-        const whatsapp = document.getElementById('whatsapp').value;
-        const fCapa = document.getElementById('fotoCapaInput').files[0];
-        const fPerfil = document.getElementById('fotoPerfilInput').files[0];
-
-        if (!nome || !fCapa || !fPerfil) {
-            alert("Preencha os campos obrigatórios e fotos!");
-            return;
-        }
-
-        alert("Reduzindo fotos para caber no sistema...");
-        const base64Capa = await reduzirFoto(fCapa);
-        const base64Perfil = await reduzirFoto(fPerfil);
-
-        await db.collection("profissionais").add({
-            nome, profissao, descricao, whatsapp,
-            fotoCapa: base64Capa,
-            fotoPerfil: base64Perfil,
-            data: new Date()
-        });
-
-        alert("✅ PUBLICADO COM SUCESSO!");
-        location.reload();
-    } catch (e) {
-        alert("Erro: " + e.message);
-    }
-}
-
-async function carregarLista() {
-    const lista = document.getElementById('lista-profissionais');
-    if (!lista) return; // Se não achar o ID no HTML, ele não trava o resto
-
-    const querySnapshot = await db.collection("profissionais").orderBy("data", "desc").get();
-    lista.innerHTML = "";
-
-    querySnapshot.forEach((doc) => {
-        const p = doc.data();
-        const id = doc.id;
+    <div class="p-4 max-w-md mx-auto">
         
-        lista.innerHTML += `
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-4 p-3">
-                <img src="${p.fotoCapa}" class="w-full h-32 object-cover rounded-lg">
-                <div class="flex flex-col items-center mt-[-40px]">
-                    <img src="${p.fotoPerfil}" class="w-20 h-20 rounded-full border-4 border-white object-cover">
-                    <h2 class="text-xl font-bold mt-2">${p.nome}</h2>
-                    <p class="text-blue-600 font-bold">${p.profissao}</p>
-                    <p class="text-gray-600 text-sm text-center mt-2">${p.descricao}</p>
-                    <div class="flex gap-2 mt-4 w-full">
-                        <a href="https://wa.me/55${p.whatsapp.replace(/\D/g,'')}" target="_blank" class="flex-1 bg-green-500 text-white text-center py-2 rounded-lg font-bold">WHATSAPP</a>
-                        <button onclick="denunciar('${p.nome}', '${id}')" class="bg-gray-100 text-gray-500 px-2 py-1 rounded text-[10px]">DENUNCIAR</button>
-                    </div>
-                    ${modoAdmin ? `<button onclick="remover('${id}')" class="w-full bg-red-600 text-white py-2 rounded-lg mt-2 font-bold">APAGAR POST</button>` : ""}
-                </div>
-            </div>`;
-    });
-}
+        <div class="bg-white p-4 rounded-xl shadow-md mb-6">
+            <h2 class="font-bold mb-4 text-gray-700">Anunciar Profissional</h2>
+            <input type="text" id="nome" placeholder="Nome Completo" class="w-full border p-2 rounded mb-2">
+            <input type="text" id="profissao" placeholder="Sua Profissão" class="w-full border p-2 rounded mb-2">
+            <textarea id="descricao" placeholder="Pequeno resumo do seu trabalho" class="w-full border p-2 rounded mb-2"></textarea>
+            <input type="text" id="whatsapp" placeholder="WhatsApp (ex: 53999254363)" class="w-full border p-2 rounded mb-2">
+            
+            <label class="block text-xs text-gray-500 mb-1">Foto de Capa (Fundo):</label>
+            <input type="file" id="fotoCapaInput" class="w-full mb-2 text-sm">
+            
+            <label class="block text-xs text-gray-500 mb-1">Foto de Perfil (Rosto):</label>
+            <input type="file" id="fotoPerfilInput" class="w-full mb-4 text-sm">
+            
+            <button onclick="salvarCadastro()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold">PUBLICAR AGORA</button>
+        </div>
 
-function denunciar(nome, id) {
-    const msg = `🚨 DENÚNCIA: ${nome} (ID: ${id})`;
-    window.open(`https://api.whatsapp.com/send?phone=5553999254363&text=${encodeURIComponent(msg)}`, '_blank');
-}
+        <hr class="mb-6">
 
-async function remover(id) {
-    if(confirm("Apagar?")) {
-        await db.collection("profissionais").doc(id).delete();
-        location.reload();
-    }
-}
+        <div id="lista-profissionais" class="space-y-4">
+            </div>
 
-function ativarAdmin() {
-    if (prompt("Senha:") === "2505") {
-        localStorage.setItem('admin_key', "2505");
-        location.reload();
-    }
-}
+    </div>
 
-carregarLista();
+    <script src="script.js"></script>
+</body>
+</html>
