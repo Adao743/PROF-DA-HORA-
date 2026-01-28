@@ -7,21 +7,19 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-
     <style>
         .perfil-img { width: 80px; height: 80px; border: 4px solid white; margin-top: -40px; }
+        .capa-img { width: 100%; height: 120px; object-fit: cover; border-radius: 12px 12px 0 0; }
     </style>
 </head>
 <body class="bg-gray-100 p-2">
     <div class="max-w-md mx-auto space-y-4">
-        
-        <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-md w-full">
-    <h1 onclick="ativarAdmin()" class="text-xl font-bold text-blue-700" style="cursor: pointer; flex-shrink: 0;">PROF DA HORA</h1>
-    <button onclick="location.reload()" class="bg-red-500 text-white px-4 py-1 rounded font-bold text-sm shadow-sm" style="margin-left: 10px;">SAIR</button>
-</div>
+        <div class="flex justify-between items-center bg-white p-3 rounded-xl shadow-md w-full">
+            <h1 onclick="ativarAdmin()" class="text-lg font-bold text-blue-700" style="cursor: pointer;">PROF DA HORA</h1>
+            <button onclick="location.reload()" class="bg-red-500 text-white px-3 py-1 rounded-lg font-bold text-xs shadow-sm">SAIR</button>
+        </div>
 
         <div class="bg-white p-6 rounded-xl shadow-md">
             <div id="formulario" class="space-y-3">
