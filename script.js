@@ -14,11 +14,11 @@ const db = firebase.firestore();
 // VERIFICAÇÃO DE SEGURANÇA (Só vira true se a senha for 2505)
 const modoAdmin = localStorage.getItem('admin_key') === "2505";
 
-// 1. FUNÇÃO SAIR (Limpa a senha e sai do app)
+// 1. FUNÇÃO SAIR (Ajustada para forçar a ida ao Google)
 function sairGeral() {
-    localStorage.removeItem('admin_key'); // Remove a permissão de admin
-    alert("Saindo...");
-    window.location.href = "https://www.google.com";
+    localStorage.clear(); // Limpa tudo (admin e restos de memória)
+    window.location.replace("https://www.google.com");
+}
 }
 
 // 2. FUNÇÃO ATIVAR ADMIN (Com senha)
