@@ -94,24 +94,25 @@ async function carregarLista() {
         const id = doc.id;
         lista.innerHTML += `
             <div class="card-item bg-white rounded-xl shadow-lg overflow-hidden mb-4 p-3 relative">
-                <button onclick="curtir('${id}')" class="absolute top-3 right-3 flex flex-col items-center text-red-500 hover:scale-110 transition">
-                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <div onclick="curtir('${id}')" class="absolute top-2 right-2 z-50 flex flex-col items-center bg-white/90 p-1 rounded-lg shadow-sm cursor-pointer">
+                    <svg class="w-6 h-6 text-red-500" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                     </svg>
-                    <span class="text-xs font-bold text-gray-600">${p.likes || 0}</span>
-                </button>
+                    <span class="text-xs font-black text-gray-700">${p.likes || 0}</span>
+                </div>
 
                 <img src="${p.fotoCapa}" class="w-full h-32 object-cover rounded-lg">
                 <div class="flex flex-col items-center mt-[-40px]">
-                    <img src="${p.fotoPerfil}" class="w-20 h-20 rounded-full border-4 border-white object-cover bg-white">
-                    <h2 class="text-xl font-bold mt-2">${p.nome}</h2>
+                    <img src="${p.fotoPerfil}" class="w-20 h-20 rounded-full border-4 border-white object-cover bg-white shadow-md">
+                    <h2 class="text-xl font-bold mt-2 text-center uppercase">${p.nome}</h2>
                     <p class="text-blue-600 font-bold">${p.profissao}</p>
-                    <p class="text-gray-600 text-sm text-center mt-2">${p.descricao}</p>
+                    <p class="text-gray-600 text-sm text-center mt-2 px-2">${p.descricao}</p>
+                    
                     <div class="flex gap-2 mt-4 w-full">
-                        <a href="https://wa.me/55${p.whatsapp.replace(/\D/g,'')}" target="_blank" class="flex-1 bg-green-500 text-white text-center py-2 rounded-lg font-bold">WHATSAPP</a>
-                        <button onclick="denunciar('${p.nome}', '${id}')" class="bg-gray-100 text-gray-500 px-2 py-1 rounded text-[10px]">DENUNCIAR</button>
+                        <a href="https://wa.me/55${p.whatsapp.replace(/\D/g,'')}" target="_blank" class="flex-1 bg-green-500 text-white text-center py-3 rounded-xl font-black">WHATSAPP</a>
+                        <button onclick="denunciar('${p.nome}', '${id}')" class="bg-gray-100 text-gray-400 px-3 py-1 rounded-xl text-[10px] font-bold">DENUNCIAR</button>
                     </div>
-                    ${modoAdmin ? `<button onclick="remover('${id}')" class="w-full bg-red-600 text-white py-2 rounded-lg mt-2 font-bold">APAGAR POST</button>` : ""}
+                    ${modoAdmin ? `<button onclick="remover('${id}')" class="w-full bg-red-600 text-white py-2 rounded-xl mt-2 font-bold shadow-md">APAGAR POST</button>` : ""}
                 </div>
             </div>`;
     });
