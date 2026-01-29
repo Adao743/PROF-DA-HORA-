@@ -134,3 +134,22 @@ function toggleForm() {
         form.style.display = "none";
     }
 }
+function filtrarProfissionais() {
+    // Pega o que o usuário digitou e transforma em minúsculo
+    let input = document.getElementById('campo-pesquisa').value.toLowerCase();
+    // Pega todos os cards de profissionais que estão na tela
+    let lista = document.getElementById('lista-profissionais');
+    let cards = lista.getElementsByClassName('bg-white'); // Pega as divs dos cards
+
+    for (let i = 0; i < cards.length; i++) {
+        // Pega o texto dentro do card (nome e profissão)
+        let conteudoCard = cards[i].innerText.toLowerCase();
+        
+        // Se o texto digitado estiver dentro do card, ele mostra, se não, esconde
+        if (conteudoCard.includes(input)) {
+            cards[i].style.display = "";
+        } else {
+            cards[i].style.display = "none";
+        }
+    }
+}
