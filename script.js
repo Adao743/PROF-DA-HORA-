@@ -103,13 +103,11 @@ async function carregarLista() {
                     <p class="text-blue-600 font-bold">${p.profissao}</p>
                     <p class="text-gray-600 text-sm text-center mt-2 px-2 line-clamp-2">${p.descricao}</p>
 
-                    <div class="flex items-center justify-center gap-4 mt-3 mb-1">
-                        <div onclick="curtir('${id}')" class="flex items-center gap-1 cursor-pointer hover:scale-110 transition active:scale-90">
-                            <svg class="w-7 h-7 text-red-500" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                            </svg>
-                            <span class="font-black text-lg text-gray-700">${p.likes || 0}</span>
-                        </div>
+                    <div class="flex items-center justify-center gap-2 mt-4 mb-2 bg-gray-50 py-2 px-4 rounded-full border border-gray-100 shadow-sm" onclick="curtir('${id}')" style="cursor: pointer;">
+                        <svg class="w-6 h-6 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                        <span class="font-black text-lg text-gray-700">${p.likes || 0}</span>
                     </div>
                     
                     <div class="flex gap-2 mt-2 w-full">
@@ -117,6 +115,9 @@ async function carregarLista() {
                         <button onclick="denunciar('${p.nome}', '${id}')" class="bg-gray-100 text-gray-400 px-3 py-1 rounded-xl text-[10px] font-bold uppercase">Denunciar</button>
                     </div>
 
+                    ${modoAdmin ? `<button onclick="remover('${id}')" class="w-full bg-red-600 text-white py-3 rounded-xl mt-2 font-black shadow-md uppercase">Apagar Post</button>` : ""}
+                </div>
+            </div>`;
                     ${modoAdmin ? `<button onclick="remover('${id}')" class="w-full bg-red-600 text-white py-3 rounded-xl mt-2 font-black shadow-md uppercase">Apagar Post</button>` : ""}
                 </div>
             </div>`;
