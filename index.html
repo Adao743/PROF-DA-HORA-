@@ -1,66 +1,148 @@
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prof da Hora</title>
+    <title>Trampo Certo</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 </head>
-<div class="bg-white p-4 shadow-md border-b border-gray-100">
+<body class="bg-gray-100 min-h-screen">
+
     <div class="bg-blue-600 p-4 text-white flex justify-between items-center shadow-md">
-    <h1 class="font-bold text-xl uppercase tracking-wider" onclick="ativarAdmin()">TRAMPO CERTO</h1>
-    <button onclick="sairGeral()" class="bg-red-500 px-4 py-1 rounded-lg font-bold text-sm shadow">Sair</button>
-    </di>
-        <h1 class="font-bold text-xl" onclick="ativarAdmin()">TRAMPO CERTO</h1>
-        <button onclick="sairGeral()" class="bg-red-500 px-4 py-1 rounded-lg font-bold text-sm">Sair</button>
+        <h1 class="font-bold text-xl uppercase tracking-wider" onclick="ativarAdmin()">TRAMPO CERTO</h1>
+        <button onclick="sairGeral()" class="bg-red-500 px-4 py-1 rounded-lg font-bold text-sm shadow">Sair</button>
     </div>
 
     <div class="p-4 max-w-md mx-auto">
         
-        <div class="max-w-md mx-auto"> 
-    <button onclick="toggleForm()" class="w-full bg-green-600 text-white py-3 rounded-xl font-bold mb-4 shadow-lg">
-        QUERO ME CADASTRAR
-    </button>
-<div class="mb-6">
-    <div class="relative">
-        <span class="absolute inset-y-0 left-0 flex items-center pl-3">
-            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-            </svg>
-        </span>
-        <input type="text" id="campo-pesquisa" onkeyup="filtrarProfissionais()" placeholder="Pesquisar profissional ou serviço..." 
-        class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm">
-    </div>
-    <div id="form-cadastro" style="display: none;">
-        <div class="bg-white p-4 rounded-xl shadow-md mb-6 border-2 border-green-100">
-            <h2 class="font-bold mb-4 text-gray-700 text-center">Novo Cadastro</h2>
-            
-            <input type="text" id="nome" placeholder="Nome Completo" class="w-full p-2 border rounded mb-2">
-            <input type="text" id="profissao" placeholder="Sua Profissão" class="w-full p-2 border rounded mb-2">
-            <textarea id="descricao" placeholder="Pequeno resumo do seu trabalho" class="w-full p-2 border rounded mb-2"></textarea>
-            <input type="text" id="whatsapp" placeholder="WhatsApp (ex: 53999254363)" class="w-full p-2 border rounded mb-2">
+        <button onclick="toggleForm()" class="w-full bg-green-600 text-white py-3 rounded-xl font-bold mb-6 shadow-lg active:scale-95 transition-transform">
+            QUERO ME CADASTRAR
+        </button>
 
-            <label class="block text-xs text-gray-500 mb-1">Foto de Capa (Fundo):</label>
-            <input type="file" id="fotoCapaInput" class="w-full mb-2">
-
-            <label class="block text-xs text-gray-500 mb-1">Foto de Perfil (Rosto):</label>
-            <input type="file" id="fotoPerfilInput" class="w-full mb-4">
-
-            <button onclick="salvarCadastro()"
-                PUBLICAR AGORA
-            </button>
-            
-            <button onclick="toggleForm()" class="w-full text-red-500 mt-4 text-sm font-semibold">
-                ✖ CANCELAR / FECHAR
-            </button>
+        <div id="form-cadastro" class="bg-white p-6 rounded-2xl shadow-xl mb-6 hidden border border-gray-200">
+            <h2 class="text-xl font-bold mb-4 text-gray-800 border-b pb-2 text-center">Cadastro de Profissional</h2>
+            <div class="space-y-4">
+                <input type="text" id="nome" placeholder="Seu Nome Completo" class="w-full p-3 border rounded-xl bg-gray-50 focus:ring-2 focus:ring-blue-500 outline-none">
+                <input type="text" id="servico" placeholder="Seu Serviço (Ex: Eletricista)" class="w-full p-3 border rounded-xl bg-gray-50 focus:ring-2 focus:ring-blue-500 outline-none">
+                <input type="tel" id="whatsapp" placeholder="Seu WhatsApp (Somente números)" class="w-full p-3 border rounded-xl bg-gray-50 focus:ring-2 focus:ring-blue-500 outline-none">
+                <button onclick="salvarCadastro()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition">
+                    PUBLICAR AGORA
+                </button>
+            </div>
         </div>
+
+        <div class="mb-6">
+            <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </span>
+                <input type="text" id="campo-pesquisa" onkeyup="filtrarProfissionais()" placeholder="Pesquisar profissional ou serviço..." 
+                class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm">
+            </div>
+        </div>
+
+        <div id="lista-profissionais" class="space-y-4">
+            </div>
     </div>
 
-    <div id="lista-profissionais"></div>
-  </div><script src="script.js"></script>
+    <script>
+        let profissionais = JSON.parse(localStorage.getItem('profissionais')) || [];
+
+        function toggleForm() {
+            const form = document.getElementById('form-cadastro');
+            form.classList.toggle('hidden');
+        }
+
+        function salvarCadastro() {
+            const nome = document.getElementById('nome').value;
+            const servico = document.getElementById('servico').value;
+            const whatsapp = document.getElementById('whatsapp').value;
+
+            if (nome && servico && whatsapp) {
+                const novoProfissional = { nome, servico, whatsapp };
+                profissionais.push(novoProfissional);
+                localStorage.setItem('profissionais', JSON.stringify(profissionais));
+                
+                document.getElementById('nome').value = '';
+                document.getElementById('servico').value = '';
+                document.getElementById('whatsapp').value = '';
+                
+                toggleForm();
+                renderizarLista();
+                alert('Anúncio publicado com sucesso!');
+            } else {
+                alert('Por favor, preencha todos os campos!');
+            }
+        }
+
+        function renderizarLista(filtro = '') {
+            const lista = document.getElementById('lista-profissionais');
+            lista.innerHTML = '';
+
+            const filtrados = profissionais.filter(p => 
+                p.nome.toLowerCase().includes(filtro.toLowerCase()) || 
+                p.servico.toLowerCase().includes(filtro.toLowerCase())
+            );
+
+            filtrados.forEach((p, index) => {
+                const card = `
+                    <div class="bg-white p-5 rounded-2xl shadow-md border-l-4 border-blue-600 flex justify-between items-center transition hover:shadow-lg">
+                        <div class="flex-1">
+                            <h3 class="font-bold text-lg text-gray-800 uppercase">${p.nome}</h3>
+                            <p class="text-blue-600 font-medium">${p.servico}</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <a href="https://wa.me/55${p.whatsapp}" target="_blank" class="bg-green-500 text-white p-3 rounded-full hover:bg-green-600 shadow">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-2.135 0-4.148 1.103-5.31 2.871-.161.244-.128.571.077.776.241.242.637.211.839-.068 1.002-1.385 2.593-2.191 4.394-2.191 2.876 0 5.216 2.34 5.216 5.216 0 1.25-.439 2.454-1.238 3.41-.21.251-.233.614-.051.89l.044.06c.214.288.636.331.895.096a7.221 7.221 0 001.76-4.456c0-4.001-3.246-7.247-7.247-7.247zM6.16 11.171c0 .245.098.48.273.655.176.176.411.274.656.274h1.168c.245 0 .48-.098.656-.274a.925.925 0 00.273-.655v-1.168c0-.245-.098-.48-.273-.656A.925.925 0 008.257 9.1h-1.168c-.245 0-.481.098-.656.273a.927.927 0 00-.273.656v1.142zm9.143 0c0 .245.097.48.273.655.176.176.41.274.655.274h1.169c.245 0 .48-.098.655-.274a.925.925 0 00.274-.655v-1.168c0-.245-.099-.48-.274-.656a.925.925 0 00-.655-.273H16.23c-.245 0-.48.098-.655.273a.927.927 0 00-.273.656v1.142zM12 2C6.477 2 2 6.477 2 12c0 1.891.524 3.662 1.435 5.174l-1.435 5.826 6.136-1.402C9.406 21.84 10.666 22 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18c-1.391 0-2.693-.311-3.857-.866l-.276-.13-3.619.827.844-3.43-.146-.245A7.957 7.957 0 014 12c0-4.411 3.589-8 8-8s8 3.589 8 8-3.589 8-8 8z"/></svg>
+                            </a>
+                            <button onclick="excluirAnuncio(${index})" class="bg-gray-100 text-gray-400 p-3 rounded-full hover:bg-red-100 hover:text-red-500 transition shadow-sm admin-btn hidden">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                lista.innerHTML += card;
+            });
+            atualizarVisibilidadeAdmin();
+        }
+
+        function filtrarProfissionais() {
+            const termo = document.getElementById('campo-pesquisa').value;
+            renderizarLista(termo);
+        }
+
+        function excluirAnuncio(index) {
+            if(confirm('Deseja realmente excluir este anúncio?')) {
+                profissionais.splice(index, 1);
+                localStorage.setItem('profissionais', JSON.stringify(profissionais));
+                renderizarLista();
+            }
+        }
+
+        function ativarAdmin() {
+            const senha = prompt('Digite a senha de administrador:');
+            if (senha === '123') {
+                localStorage.setItem('adminMode', 'true');
+                renderizarLista();
+            }
+        }
+
+        function sairGeral() {
+            localStorage.removeItem('adminMode');
+            renderizarLista();
+            alert('Você saiu do modo administrador.');
+        }
+
+        function atualizarVisibilidadeAdmin() {
+            const isAdmin = localStorage.getItem('adminMode') === 'true';
+            document.querySelectorAll('.admin-btn').forEach(btn => {
+                btn.style.display = isAdmin ? 'block' : 'none';
+            });
+        }
+
+        renderizarLista();
+    </script>
 </body>
 </html>
-
