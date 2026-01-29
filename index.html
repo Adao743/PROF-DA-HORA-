@@ -9,65 +9,46 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 </head>
 <body class="bg-gray-100 min-h-screen">
-
     <div class="bg-blue-600 p-4 text-white flex justify-between items-center shadow-md">
-        <h1 class="font-bold text-xl uppercase tracking-wider cursor-pointer" onclick="ativarAdmin()">TRAMPO CERTO</h1>
-        <button onclick="sairGeral()" class="bg-red-500 px-4 py-1 rounded-lg font-bold text-sm shadow">Sair</button>
+        <h1 class="font-bold text-xl uppercase cursor-pointer" onclick="ativarAdmin()">TRAMPO CERTO</h1>
+        <button onclick="sairGeral()" class="bg-red-500 px-4 py-1 rounded-lg font-bold text-sm">Sair</button>
     </div>
 
     <div class="p-4 max-w-md mx-auto">
-        
-        <button onclick="toggleForm()" class="w-full bg-green-600 text-white py-3 rounded-xl font-bold mb-6 shadow-lg">
-            QUERO ME CADASTRAR
-        </button>
+        <button onclick="toggleForm()" class="w-full bg-green-600 text-white py-3 rounded-xl font-bold mb-6 shadow-lg">QUERO ME CADASTRAR</button>
 
         <div id="form-cadastro" class="bg-white p-6 rounded-2xl shadow-xl mb-6 hidden border border-gray-200">
-            <h2 class="text-xl font-bold mb-4 text-gray-800 text-center">Cadastro Profissional</h2>
+            <h2 class="text-xl font-bold mb-4 text-center">Cadastro</h2>
             <div class="space-y-4">
                 <input type="text" id="nome" placeholder="Nome Completo" class="w-full p-3 border rounded-xl bg-gray-50 outline-none">
                 <input type="text" id="profissao" placeholder="Sua Profissão" class="w-full p-3 border rounded-xl bg-gray-50 outline-none">
-                <textarea id="descricao" placeholder="Resumo do seu trabalho" class="w-full p-3 border rounded-xl bg-gray-50 outline-none"></textarea>
                 <input type="text" id="whatsapp" placeholder="WhatsApp (DDD + Número)" class="w-full p-3 border rounded-xl bg-gray-50 outline-none">
                 
-                <p class="text-xs text-gray-500">Foto de Capa e Perfil (Links)</p>
-                <input type="text" id="fotoCapaInput" placeholder="Link da Foto de Capa" class="w-full p-3 border rounded-xl bg-gray-50 outline-none">
-                <input type="text" id="fotoPerfilInput" placeholder="Link da Foto de Perfil" class="w-full p-3 border rounded-xl bg-gray-50 outline-none">
+                <div class="text-sm font-bold text-gray-600">Foto de Capa:</div>
+                <input type="file" id="fotoCapaInput" accept="image/*" class="w-full">
+                
+                <div class="text-sm font-bold text-gray-600">Foto de Perfil:</div>
+                <input type="file" id="fotoPerfilInput" accept="image/*" class="w-full">
 
-                <button onclick="salvarCadastro()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold mt-2">
-                    PUBLICAR AGORA
-                </button>
+                <button id="btnSalvar" onclick="salvarCadastro()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold mt-2">PUBLICAR AGORA</button>
             </div>
         </div>
 
         <div class="mb-6">
             <input type="text" id="campo-pesquisa" onkeyup="filtrarProfissionais()" placeholder="Pesquisar serviço..." 
-            class="w-full p-3 border border-gray-300 rounded-xl bg-white shadow-sm outline-none focus:ring-2 focus:ring-blue-500">
+            class="w-full p-3 border border-gray-300 rounded-xl bg-white outline-none">
         </div>
-
         <div id="lista-profissionais" class="space-y-4"></div>
     </div>
 
     <script src="script.js"></script>
-
     <script>
-        function toggleForm() {
-            const form = document.getElementById('form-cadastro');
-            form.classList.toggle('hidden');
-        }
-
+        function toggleForm() { document.getElementById('form-cadastro').classList.toggle('hidden'); }
         function ativarAdmin() {
             const senha = prompt('Senha Admin:');
-            if (senha === '2505') {
-                localStorage.setItem('admin_key', '2505');
-                alert('Modo Admin Ativado!');
-                location.reload();
-            }
+            if (senha === '2505') { localStorage.setItem('admin_key', '2505'); location.reload(); }
         }
-
-        function sairGeral() {
-            localStorage.removeItem('admin_key');
-            window.location.href = "https://www.google.com.br";
-        }
+        function sairGeral() { localStorage.removeItem('admin_key'); window.location.href = "https://www.google.com.br"; }
     </script>
 </body>
 </html>
