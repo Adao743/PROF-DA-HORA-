@@ -64,3 +64,24 @@ function filtrarProfissionais() {
         }
     }
 }
+
+async function curtir(id) {
+    await db.collection("profissionais").doc(id).update({
+        likes: firebase.firestore.FieldValue.increment(1)
+    });
+}
+
+function remover(id) {
+    if (confirm("Excluir cadastro?")) {
+        db.collection("profissionais").doc(id).delete().then(() => alert("Removido!"));
+    }
+}
+
+function filtrarProfissionais() {
+    let input = document.getElementById('campo-pesquisa').value.toLowerCase();
+    let cards = document.getElementById('lista-profissionais').getElementsByClassName('bg-white');
+    for (let card of cards) {
+        let texto = card.innerText.toLowerCase();
+        card.style.display = texto.includes(input) ? "" : "none";
+    }
+}
