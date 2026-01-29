@@ -93,7 +93,14 @@ async function carregarLista() {
         const p = doc.data();
         const id = doc.id;
         lista.innerHTML += `
-            <div class="card-item bg-white rounded-xl shadow-lg overflow-hidden mb-4 p-3">
+            <div class="card-item bg-white rounded-xl shadow-lg overflow-hidden mb-4 p-3 relative">
+                <button onclick="curtir('${id}')" class="absolute top-3 right-3 flex flex-col items-center text-red-500 hover:scale-110 transition">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                    <span class="text-xs font-bold text-gray-600">${p.likes || 0}</span>
+                </button>
+
                 <img src="${p.fotoCapa}" class="w-full h-32 object-cover rounded-lg">
                 <div class="flex flex-col items-center mt-[-40px]">
                     <img src="${p.fotoPerfil}" class="w-20 h-20 rounded-full border-4 border-white object-cover bg-white">
