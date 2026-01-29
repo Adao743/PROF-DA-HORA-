@@ -18,7 +18,77 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
 </head>
 <body class="bg-gray-100 min-h-screen">
+
     <div class="bg-blue-600 p-4 text-white flex justify-between items-center shadow-md">
         <h1 class="font-bold text-xl uppercase tracking-wider" style="cursor:pointer" onclick="ativarAdmin()">TRAMPO CERTO</h1>
         <button onclick="sairGeral()" class="bg-red-500 px-4 py-1 rounded-lg font-bold text-sm shadow">Sair</button>
     </div>
+
+    <div class="p-4 max-w-md mx-auto">
+        
+        <button onclick="toggleForm()" class="w-full bg-green-600 text-white py-3 rounded-xl font-bold mb-6 shadow-lg">
+            QUERO ME CADASTRAR
+        </button>
+
+        <div id="form-cadastro" class="bg-white p-6 rounded-2xl shadow-xl mb-6 hidden border border-gray-200">
+            <h2 class="text-xl font-bold mb-4 text-gray-800 text-center">Cadastro Profissional</h2>
+            <div class="space-y-4">
+                <input type="text" id="nome" placeholder="Nome Completo" class="w-full p-3 border rounded-xl bg-gray-50">
+                <input type="text" id="profissao" placeholder="Sua Profissão" class="w-full p-3 border rounded-xl bg-gray-50">
+                <textarea id="descricao" placeholder="Pequeno resumo do seu trabalho" class="w-full p-3 border rounded-xl bg-gray-50"></textarea>
+                <input type="text" id="whatsapp" placeholder="WhatsApp (DDD + Número)" class="w-full p-3 border rounded-xl bg-gray-50">
+                
+                <label class="block text-xs text-gray-500 mb-1">Foto de Capa</label>
+                <input type="file" id="fotoCapaInput" class="w-full mb-2">
+                
+                <label class="block text-xs text-gray-500 mb-1">Foto de Perfil</label>
+                <input type="file" id="fotoPerfilInput" class="w-full mb-4">
+
+                <button onclick="salvarCadastro()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold">
+                    PUBLICAR AGORA
+                </button>
+            </div>
+        </div>
+
+        <div class="mb-6 relative">
+            <input type="text" id="campo-pesquisa" onkeyup="filtrarProfissionais()" placeholder="Pesquisar profissional ou serviço..." 
+            class="block w-full pl-4 pr-3 py-3 border border-gray-300 rounded-xl bg-white shadow-sm focus:ring-2 focus:ring-blue-500 outline-none">
+        </div>
+
+        <div id="lista-profissionais" class="space-y-4">
+            </div>
+    </div>
+
+    <script src="script.js"></script>
+
+    <script>
+        // 1. Abrir/Fechar formulário
+        function toggleForm() {
+            const form = document.getElementById('form-cadastro');
+            form.classList.toggle('hidden');
+        }
+
+        // 2. Modo Admin (Senha 2505)
+        function ativarAdmin() {
+            const senha = prompt('Senha Admin:');
+            if (senha === '2505') {
+                localStorage.setItem('admin_key', '2505');
+                alert('Modo Admin Ativado!');
+                location.reload();
+            }
+        }
+
+        // 3. Função Sair (Limpa o Admin e desloga)
+        function sairGeral() {
+            localStorage.removeItem('admin_key');
+            if (firebase.auth()) {
+                firebase.auth().signOut().then(() => {
+                    location.reload();
+                });
+            } else {
+                location.reload();
+            }
+        }
+    </script>
+</body>
+</html>
