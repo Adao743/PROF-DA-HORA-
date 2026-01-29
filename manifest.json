@@ -1,0 +1,15 @@
+{
+  "name": "Trampo Certo",
+  "short_name": "TrampoCerto",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "BackgroundEraser_20260129_024712183.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}
