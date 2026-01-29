@@ -7,7 +7,7 @@
   "theme_color": "#2563eb",
   "icons": [
     {
-      "src": "BackgroundEraser_logo.jpg",
+      "src": "logo.jpg",
       "sizes": "512x512",
       "type": "image/jpeg"
     }
