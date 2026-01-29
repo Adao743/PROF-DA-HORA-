@@ -24,7 +24,7 @@ db.collection("profissionais").orderBy("data", "desc").onSnapshot((querySnapshot
             <div class="bg-white rounded-xl shadow-lg mb-6 p-4 border border-gray-100 relative">
                 
                 ${isAdmin ? `
-                    <button onclick="removerProfissional('${id}')" 
+                    <button onclick="removerProfissional('${id}')" u
                             style="position: absolute; top: 10px; right: 10px; z-index: 99; background-color: #dc2626; color: white; padding: 5px 10px; border-radius: 8px; font-weight: bold; font-size: 10px; border: none;">
                         EXCLUIR
                     </button>
