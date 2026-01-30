@@ -49,7 +49,7 @@ db.collection("profissionais").orderBy("data", "desc").onSnapshot((querySnapshot
                     <div onclick="curtir('${id}')" class="flex items-center gap-2 mb-3 bg-red-50 px-4 py-1 rounded-full cursor-pointer">
                         <span>❤️</span><span class="font-bold text-red-600">${p.likes || 0}</span>
                     </div>
-                    <a href="https://wa.me/55${p.whatsapp}" target="_blank" class="w-full bg-green-500 text-white py-3 rounded-xl font-bold shadow-md">WHATSAPP</a>
+                    <a href="https://wa.me/${p.whatsapp}" target="_blank" class="w-full bg-green-500 text-white py-3 rounded-xl font-bold shadow-md">WHATSAPP</a>
                 </div>
             </div>`;
     });
